@@ -301,7 +301,7 @@ def add_object_cached(col, name, col_obj, fcl_obj):
     return o
 
 
-def col_from_subset(scene, names, tags=None, bvh_cache=None):
+def col_from_subset(scene, names, tags=None, bvh_cache=None): 
     if isinstance(names, str):
         names = [names]
 
@@ -315,31 +315,31 @@ def col_from_subset(scene, names, tags=None, bvh_cache=None):
     col = trimesh.collision.CollisionManager()
 
     for name in names:
-        T, g = scene.graph[name]
-        geom = scene.geometry[g]
-        if tags is not None and len(tags) > 0:
-            obj = blender_objs_from_names(name)[0]
-            mask = tagging.tagged_face_mask(obj, tags)
-            if not mask.any():
+        T, g = scene.graph[name]  # 从场景图中获取变换矩阵和几何体索引
+        geom = scene.geometry[g] # 获取几何体
+        if tags is not None and len(tags) > 0: # 如果存在标签并且标签数量大于零
+            obj = blender_objs_from_names(name)[0]  # 从名称中获取Blender对象
+            mask = tagging.tagged_face_mask(obj, tags) # 获取面标记掩码
+            if not mask.any():  # 如果没有面被标记
                 logger.warning(f"{name=} had {mask.sum()=} for {tags=}")
                 continue
-            geom = geom.submesh(np.where(mask), append=True)
-            T = trimesh.transformations.identity_matrix()
-            t = fcl.Transform(T[:3, :3], T[:3, 3])
-            geom.fcl_obj = col._get_fcl_obj(geom)
-            geom.col_obj = fcl.CollisionObject(geom.fcl_obj, t)
-            assert len(geom.faces) == mask.sum()
+            geom = geom.submesh(np.where(mask), append=True)  # 获取被标记的子网格
+            T = trimesh.transformations.identity_matrix()  # 设置变换矩阵为单位矩阵
+            t = fcl.Transform(T[:3, :3], T[:3, 3]) # 创建 FCL 变换对象
+            geom.fcl_obj = col._get_fcl_obj(geom)  # 获取 FCL 对象
+            geom.col_obj = fcl.CollisionObject(geom.fcl_obj, t) # 创建碰撞对象
+            assert len(geom.faces) == mask.sum()  # 确保面数匹配
         # col.add_object(name, geom, T)
-        add_object_cached(col, name, geom.col_obj, geom.fcl_obj)
+        add_object_cached(col, name, geom.col_obj, geom.fcl_obj)  # 使用缓存添加对象
 
-    if len(col._objs) == 0:
+    if len(col._objs) == 0: # 如果没有对象被添加
         logger.debug(f"{names=} got no objs, returning None")
         col = None
 
-    if bvh_cache is not None and bvh_caching_config():
-        bvh_cache[key] = col
+    if bvh_cache is not None and bvh_caching_config(): # 如果存在缓存并且缓存配置有效
+        bvh_cache[key] = col # 将结果存入缓存
 
-    return col
+    return col # 返回碰撞体集合
 
 
 def plot_geometry(ax, geom, color="blue"):

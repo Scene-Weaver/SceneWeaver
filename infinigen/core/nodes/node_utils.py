@@ -126,14 +126,21 @@ def resample_node_group(nw: NodeWrangler, scene_seed: int):
 
 
 def build_color_ramp(nw, x, positions, colors, mode="HSV"):
+    # 创建一个新的颜色渐变节点，输入为 x
     cr = nw.new_node(Nodes.ColorRamp, input_kwargs={"Fac": x})
+    # 设置颜色模式为指定的模式（默认是 HSV）
     cr.color_ramp.color_mode = mode
+    # 获取颜色渐变元素
     elements = cr.color_ramp.elements
-    size = len(positions)
+    # 获取位置的数量
+    size = len(positions) 
+     # 确保颜色的数量与位置数量一致
     assert len(colors) == size
+    # 如果位置数量大于 2，添加额外的颜色渐变元素
     if size > 2:
         for _ in range(size - 2):
             elements.new(0)
+    # 将每个位置和对应的颜色设置到渐变元素中
     for i, (p, c) in enumerate(zip(positions, colors)):
         elements[i].position = p
         elements[i].color = c

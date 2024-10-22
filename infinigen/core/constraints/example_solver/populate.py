@@ -87,13 +87,23 @@ def populate_state_placeholders(state: State, filter=None, final=True):
         update_state_mesh_objs.append((objkey, old_objname))
 
         *_, inst_seed = parse_asset_name(placeholder.name)
-        os.obj = os.generator.spawn_asset(
+        import pdb
+        pdb.set_trace()
+        os.obj,center,size = os.generator.spawn_asset(
             i=int(inst_seed),
             loc=placeholder.location,  # we could use placeholder=pholder here, but I worry pholder may have been modified
-            rot=placeholder.rotation_euler,
+            rot=placeholder.rotation_euler,  #MARK
         )
         os.generator.finalize_assets([os.obj])
         butil.put_in_collection(os.obj, unique_assets)
+        import pdb
+        pdb.set_trace()
+        print(center)
+        state.obj_info[os.obj.name] = { #"category":os.obj.name.split("(")[0],
+                                       "location":placeholder.location, 
+                                       "rotation":placeholder.rotation_euler,
+                                       "center":center,
+                                       "size":size}
 
         cutter = next(
             (o for o in butil.iter_object_tree(os.obj) if o.name.endswith(".cutter")),

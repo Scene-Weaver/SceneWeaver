@@ -85,11 +85,14 @@ class Addition(moves.Move):
     def __repr__(self):
         return f"{self.__class__.__name__}({self.gen_class.__name__}, {len(self.relation_assignments)} relations)"
 
-    def apply(self, state: State):
+    def apply(self, state: State): #mark
         (target_name,) = self.names
         assert target_name not in state.objs
 
         self._new_obj, gen = sample_rand_placeholder(self.gen_class)
+        
+        center = np.array([v.co for v in self._new_obj.data.vertices]).mean(axis=0)
+        size = self._new_obj.dimensions
 
         parse_scene.add_to_scene(state.trimesh_scene, self._new_obj, preprocess=True)
 
@@ -104,7 +107,7 @@ class Addition(moves.Move):
         )
 
         state.objs[target_name] = objstate
-        success = dof.try_apply_relation_constraints(state, target_name)
+        success = dof.try_apply_relation_constraints(state, target_name)  #check
         logger.debug(f"{self} {success=}")
         return success
 
@@ -138,7 +141,8 @@ class Resample(moves.Move):
         scene = state.trimesh_scene
         scene.graph.transforms.remove_node(os.obj.name)
         scene.delete_geometry(os.obj.name + "_mesh")
-
+        import pdb
+        pdb.set_trace()
         os.obj, os.generator = sample_rand_placeholder(os.generator.__class__)
 
         if self.align_corner is not None:

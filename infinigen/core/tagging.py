@@ -347,8 +347,12 @@ def union_object_tags(obj):
 
 def tagged_face_mask(obj: bpy.types.Object, tags: Union[t.Subpart]) -> np.ndarray:
     # ASSUMES: object is triangulated, no quads/polygons
-
+    #find the face that satisfy tags
+    
+    import pdb
+    pdb.set_trace()
     tags = t.to_tag_set(tags)
+    print(tags)
     pos_tags = [
         t.to_string(tagval) for tagval in tags if not isinstance(tagval, t.Negated)
     ]
@@ -362,16 +366,19 @@ def tagged_face_mask(obj: bpy.types.Object, tags: Union[t.Subpart]) -> np.ndarra
         return np.ones(n_poly, dtype=bool)
     masktag = surface.read_attr_data(obj, COMBINED_ATTR_NAME, domain="FACE")
     face_mask = np.zeros(n_poly, dtype=bool)
+    
 
     for v in np.unique(masktag):
         if v == 0:
             name_parts = []
         else:
             name_parts = _name_for_tagval(v).split(".")
+            #['interior', 'invisible', 'room', 'wall']
+        print(name_parts)
 
         v_mask = masktag == v
 
-        if len(pos_tags) > 0 and not all(tag in name_parts for tag in pos_tags):
+        if len(pos_tags) > 0 and not all(tag in name_parts for tag in pos_tags): #pos_tags=['wall', 'visible']
             continue
         if len(neg_tags) > 0 and any(tag in name_parts for tag in neg_tags):
             continue

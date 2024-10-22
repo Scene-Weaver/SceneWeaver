@@ -193,38 +193,42 @@ class SimulatedAnnealingSolver:
         temp: float,
         filter_domain: r.Domain,
     ) -> typing.Tuple[Move, evaluator.EvalResult, int]:
+       
         move_gen = propose_func(consgraph, state, filter_domain, temp)
 
         move = None
         retry = None
-        for retry, move in enumerate(move_gen):  # MARK
-            if retry == self.max_invalid_candidates:
+       
+        for retry, move in enumerate(move_gen):  # MARK # MARK：遍历移动生成器
+            if retry == self.max_invalid_candidates: # 如果达到最大无效候选次数
                 logger.debug(
                     f"{move_gen=} reached {self.max_invalid_candidates=} without succeeding an apply()"
                 )
-                break
-
-            succeeded = move.apply(state)
-            if succeeded:
+                break # 退出循环
+ 
+            succeeded = move.apply(state) # 尝试应用移动到当前状态
+            if succeeded:  # 如果成功应用
                 evaluator.evict_memo_for_move(consgraph, state, self.eval_memo, move)
                 result = self.evaluate_move(consgraph, state, move, filter_domain)
-                return move, result, retry
+                return move, result, retry # 返回移动、结果和尝试次数
 
             logger.debug(f"{retry=} reverting {move=}")
             evaluator.evict_memo_for_move(consgraph, state, self.eval_memo, move)
-            move.revert(state)
+            move.revert(state) # 撤销移动
 
-        else:
+        else: # 如果循环正常结束（没有找到有效移动）
             logger.debug(f"{move_gen=} produced {retry} attempts and none were valid")
 
-        return move, None, retry
-
+        return move, None, retry  # 返回最后的移动、无效结果和尝试次数
+ 
     def curr_temp(self) -> float:
         temp = self.initial_temp * self.cooling_rate**self.curr_iteration
         temp = np.clip(temp, self.final_temp, self.initial_temp)
         return temp
 
     def metrop_hastings_with_viol(self, prop_result: evaluator.EvalResult, temp: float):
+        import pdb
+        pdb.set_trace()
         prop_viol = prop_result.viol_count()  # MARK
         curr_viol = self.curr_result.viol_count()
 

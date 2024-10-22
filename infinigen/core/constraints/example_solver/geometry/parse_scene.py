@@ -25,13 +25,17 @@ def to_trimesh(obj: bpy.types.Object):
 
 
 def preprocess_obj(obj):
+    # 切换到编辑模式，以便修改对象
     with butil.ViewportMode(obj, mode="EDIT"):
+        # 选择要处理的对象
         butil.select(obj)
-        bpy.ops.mesh.select_all(action="SELECT")
-        bpy.ops.mesh.quads_convert_to_tris(quad_method="BEAUTY", ngon_method="BEAUTY")
+        bpy.ops.mesh.select_all(action="SELECT")# 选择对象的所有面
+        # 将所有四边形面转换为三角形，使用“美化”方法
+        bpy.ops.mesh.quads_convert_to_tris(quad_method="BEAUTY", ngon_method="BEAUTY")  
 
+    # 更新当前视图层，以反映对对象的修改
     bpy.context.view_layer.update()
-
+    # 应用变换，只对对象的缩放进行应用，不改变位置和旋转
     butil.apply_transform(obj, loc=False, rot=False, scale=True)
 
 
@@ -55,6 +59,7 @@ def parse_scene(objects):
 def add_to_scene(scene, obj, preprocess=True):
     if preprocess:
         preprocess_obj(obj)
+
     obj_matrix_world = Matrix(obj.matrix_world)
     obj.matrix_world = Matrix.Identity(4)
     tmesh = to_trimesh(obj)

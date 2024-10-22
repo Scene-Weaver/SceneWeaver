@@ -196,6 +196,7 @@ class EvalResult:
         return sum(v for v in self.loss_vals.values())
 
     def viol_count(self):
+
         return sum(x for x in self.violations.values())
 
     def to_df(self) -> pd.DataFrame:

@@ -82,6 +82,7 @@ class Solver:
         self.optim = SimulatedAnnealingSolver(
             output_folder=output_folder,
         )
+
         self.room_solver_fn = MultistoryRoomSolver if multistory else RoomSolver
         self.state: State = None
         self.all_roomtypes = None
@@ -156,26 +157,47 @@ class Solver:
         abort_unsatisfied: bool = False,
         print_bounds: bool = False,
     ):
+        import pdb
+        pdb.set_trace()
+
         filter_domain = copy.deepcopy(filter_domain)
+        """
+        Domain({Semantics.Object, -Semantics.Room}, [
+            (StableAgainst({}, {Subpart.SupportSurface, Subpart.Visible, -Subpart.Ceiling, -Subpart.Wall}), Domain({Semantics.Bathroom, Variable(room), Semantics.Room, -Semantics.Object}, [])),
+            (-AnyRelation(), Domain({Semantics.Object, -Semantics.Room}, []))
+        ])
+        """
 
-        desc_full = (desc, *var_assignments.values())  # ('on_floor_0', 'bedroom_0-0')
+        desc_full = (desc, *var_assignments.values()) 
+        #('on_floor_0', 'bathroom_0-0')
 
-        dom_assignments = {  # {Variable(room): Domain({Semantics.Room, Semantics.Bedroom, SpecificObject(name='bedroom_0-0')}, [])}
+
+        dom_assignments = {  
             k: r.Domain(self.state.objs[objkey].tags)
             for k, objkey in var_assignments.items()
         }
+        #{Variable(room): Domain({Semantics.Bathroom, SpecificObject(name='bathroom_0-0'), Semantics.Room}, [])}
+
+
         filter_domain = r.substitute_all(filter_domain, dom_assignments)
+        """
+        Domain({Semantics.Object, -Semantics.Room}, [
+            (StableAgainst({}, {Subpart.SupportSurface, Subpart.Visible, -Subpart.Ceiling, -Subpart.Wall}), Domain({SpecificObject(name='bathroom_0-0'), Semantics.Room, Semantics.Bathroom, -Semantics.Object}, [])),
+            (-AnyRelation(), Domain({Semantics.Object, -Semantics.Room}, []))
+        ])
+        """
 
         if not r.domain_finalized(filter_domain):
             raise ValueError(
                 f"Cannot solve {desc_full=} with non-finalized domain {filter_domain}"
             )
 
-        orig_bounds = r.constraint_bounds(consgraph)
+        orig_bounds = r.constraint_bounds(consgraph) #len(orig_bounds) = 63
         bounds = propose_discrete.preproc_bounds(
             orig_bounds, self.state, filter_domain, print_bounds=print_bounds
         )
-
+        # #len(bounds) = 5
+        
         if len(bounds) == 0:
             logger.info(f"No objects to be added for {desc_full=}, skipping")
             return self.state

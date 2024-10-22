@@ -60,6 +60,8 @@ def propose_translate(
 
         var = max(TRANS_MIN, TRANS_MULT * temperature)
         random_vector = np.random.normal(0, var, size=3)
+        import pdb
+        pdb.set_trace()
         projected_vector = obj_state.dof_matrix_translation @ random_vector
 
         yield moves.TranslateMove(

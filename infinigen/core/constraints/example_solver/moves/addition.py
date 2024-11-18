@@ -75,13 +75,13 @@ def sample_rand_placeholder(gen_class: type[AssetFactory]):
 @dataclass
 class Addition(moves.Move):
     """Move which generates an object and adds it to the scene with certain relations"""
-    
+
     gen_class: typing.Any
     relation_assignments: list
     temp_force_tags: set
 
     _new_obj: bpy.types.Object = None
-   
+
     def __repr__(self):
         return f"{self.__class__.__name__}({self.gen_class.__name__}, {len(self.relation_assignments)} relations)"
         # Addition(BedFactory, 2 relations)
@@ -89,7 +89,7 @@ class Addition(moves.Move):
     def apply(self, state: State, expand_collision=False):  # mark
         (target_name,) = self.names
         assert target_name not in state.objs
-    
+
         self._new_obj, gen = sample_rand_placeholder(self.gen_class)
 
         # center = np.array([v.co for v in self._new_obj.data.vertices]).mean(axis=0)
@@ -108,8 +108,10 @@ class Addition(moves.Move):
         )
 
         state.objs[target_name] = objstate
-    
-        success = dof.try_apply_relation_constraints(state, target_name,expand_collision=expand_collision)  # check
+
+        success = dof.try_apply_relation_constraints(
+            state, target_name, expand_collision=expand_collision
+        )  # check
         if success:
             a = 1
         logger.debug(f"{self} {success=}")

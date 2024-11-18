@@ -141,34 +141,43 @@ class ContactResult:
     names: list[str]
     contacts: list
 
+
 @dataclass
 class Contact:
     depth: float
     names: list[str]
 
-def bbox_collision(src_geoms,tar_geoms):
+
+def bbox_collision(src_geoms, tar_geoms):
     contacts = []
     hit = False
     for src_geom in src_geoms:
-        bounds1 = (src_geom.bounds)
+        bounds1 = src_geom.bounds
         for tar_geom in tar_geoms:
-            bounds2 = (tar_geom.bounds)
-            observed_depth = min([min(i,j) for i,j in zip((bounds1[1]-bounds2[0]),(bounds2[1]-bounds1[0]))])
-            if observed_depth>0:
+            bounds2 = tar_geom.bounds
+            observed_depth = min(
+                [
+                    min(i, j)
+                    for i, j in zip(
+                        (bounds1[1] - bounds2[0]), (bounds2[1] - bounds1[0])
+                    )
+                ]
+            )
+            if observed_depth > 0:
                 hit = True
                 contact = Contact(depth=observed_depth)
                 contacts.append(contact)
 
-    
-    return hit,None,contacts
+    return hit, None, contacts
 
-def intersection(src_geoms,tar_geoms,src_names,target_names):
+
+def intersection(src_geoms, tar_geoms, src_names, target_names):
     contacts = []
     names = []
     hit = False
 
-    for src_geom,src_name in zip(src_geoms,src_names):
-        for tar_geom,target_name in zip(tar_geoms,target_names):
+    for src_geom, src_name in zip(src_geoms, src_names):
+        for tar_geom, target_name in zip(tar_geoms, target_names):
             intersection = trimesh.boolean.intersection([src_geom, tar_geom])
             # if "BedFactory" in src_name and "bedroom" in target_name:
             #     import pdb
@@ -177,16 +186,16 @@ def intersection(src_geoms,tar_geoms,src_names,target_names):
                 hit = True
                 volume = intersection.volume
                 bounds = intersection.bounds  # Returns an array with min and max points
-                size = bounds[1] - bounds[0] 
-                size.sort() #small -> big
-                depth = volume/size[-1]/size[-2]
+                size = bounds[1] - bounds[0]
+                size.sort()  # small -> big
+                depth = volume / size[-1] / size[-2]
                 # depth = size[0]
-                contact = Contact(depth=depth,names=["not known"])
+                contact = Contact(depth=depth, names=["not known"])
                 contacts.append(contact)
-                names.append((src_name,target_name))
-            
-    
-    return hit,names,contacts
+                names.append((src_name, target_name))
+
+    return hit, names, contacts
+
 
 def any_touching_expand(
     scene: Scene,
@@ -209,9 +218,13 @@ def any_touching_expand(
     # import pdb
     # pdb.set_trace()
     # print(a)
-    col,geoms_target = iu.col_from_subset(scene, a, a_tags, bvh_cache,return_geom=True)
-    col_expand,geoms_expand_target = iu.col_from_subset(scene, a, a_tags, bvh_cache, expand=True,export=False,return_geom=True)
-    
+    col, geoms_target = iu.col_from_subset(
+        scene, a, a_tags, bvh_cache, return_geom=True
+    )
+    col_expand, geoms_expand_target = iu.col_from_subset(
+        scene, a, a_tags, bvh_cache, expand=True, export=False, return_geom=True
+    )
+
     # 检查不同的碰撞情况
 
     if b is None and len(a) == 1:
@@ -221,6 +234,7 @@ def any_touching_expand(
     elif b is None:
         # 如果 b 为空且 a 有多个元素，检查内部碰撞
         import pdb
+
         pdb.set_trace()
         hit, names, contacts = col.in_collision_internal(
             return_data=True, return_names=True
@@ -233,14 +247,14 @@ def any_touching_expand(
         # if "BedFactory" in b:
         #     import pdb
         #     pdb.set_trace()
-        hit1,name1,contacts1 = intersection([geom],geoms_expand_target,[b],a)
-        hit2,name2,contacts2 = intersection([mesh_expand],geoms_target,[b],a)
+        hit1, name1, contacts1 = intersection([geom], geoms_expand_target, [b], a)
+        hit2, name2, contacts2 = intersection([mesh_expand], geoms_target, [b], a)
 
         hit = hit1 or hit2
-        names = name1+name2
+        names = name1 + name2
         contacts = contacts1 + contacts2
         # # expand a
-        
+
         #     hit1, names1, contacts1 = col_expand.in_collision_single(
         #         geom, transform=T, return_data=True, return_names=True, debug=True
         #     )
@@ -270,11 +284,13 @@ def any_touching_expand(
     elif isinstance(b, list):
         # 如果 b 是一个列表，处理多个物体之间的碰撞检测
         # expand a
-        col2,geoms = iu.col_from_subset(scene, b, b_tags, bvh_cache,return_geom=True)
-        hit1,name1,contacts1 = bbox_collision(geoms,geoms_expand_target)
+        col2, geoms = iu.col_from_subset(scene, b, b_tags, bvh_cache, return_geom=True)
+        hit1, name1, contacts1 = bbox_collision(geoms, geoms_expand_target)
         # expand b
-        col2_expand,geoms_expand = iu.col_from_subset(scene, b, b_tags, bvh_cache, expand=True,return_geom=True)
-        hit2,name2,contacts2 = bbox_collision(geoms_expand,geoms_target)
+        col2_expand, geoms_expand = iu.col_from_subset(
+            scene, b, b_tags, bvh_cache, expand=True, return_geom=True
+        )
+        hit2, name2, contacts2 = bbox_collision(geoms_expand, geoms_target)
         # combine
         hit = hit1 or hit2
         names = []

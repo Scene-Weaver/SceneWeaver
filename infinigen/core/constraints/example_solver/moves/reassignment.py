@@ -44,17 +44,17 @@ def restore_pose_backup(state, name, bak):
 
 @dataclass
 class RelationPlaneChange(moves.Move):
-    #这段代码定义了一个名为 RelationPlaneChange 的类，
+    # 这段代码定义了一个名为 RelationPlaneChange 的类，
     # 继承自 moves.Move，其作用是表示一个改变物体之间关系平面的动作。
     # 该类通过 apply 方法执行平面变更，revert 方法恢复到变更前的状态。
-    
+
     relation_idx: int
     plane_idx: int
 
     _backup_idx = None
     _backup_poseinfo = None
 
-    def apply(self, state: State,expand_collision=False):
+    def apply(self, state: State, expand_collision=False):
         (target_name,) = self.names
 
         os = state.objs[target_name]
@@ -65,7 +65,9 @@ class RelationPlaneChange(moves.Move):
 
         rels.parent_plane_idx = self.plane_idx
 
-        success = dof.try_apply_relation_constraints(state, target_name, expand_collision=expand_collision)
+        success = dof.try_apply_relation_constraints(
+            state, target_name, expand_collision=expand_collision
+        )
         return success
 
     def revert(self, state: State):
@@ -94,7 +96,9 @@ class RelationTargetChange(moves.Move):
         self._backup_poseinfo = pose_backup(os)
         rels.target_name = self.new_target
 
-        return dof.try_apply_relation_constraints(state, self._new_name, expand_collision=expand_collision)
+        return dof.try_apply_relation_constraints(
+            state, self._new_name, expand_collision=expand_collision
+        )
 
     def revert(self, state: State):
         os = state.objs[self.name]

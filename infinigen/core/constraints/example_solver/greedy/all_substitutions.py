@@ -146,10 +146,9 @@ def iterate_assignments(
         )
     # import pdb
     # pdb.set_trace()
-    candidates = sorted(objkeys_in_dom(combined, state)) 
-    #['bedroom_0-0', 'bedroom_1-0'] # state.objs.items()
-    #['195935_BedFactory', '198585_SimpleBookcaseFactory', '289804_FloorLampFactory', '310956_SimpleBookcaseFactory', '354075_SingleCabinetFactory', '651706_LargePlantContainerFactory', '874227_SimpleBookcaseFactory', '968015_SingleCabinetFactory']
-
+    candidates = sorted(objkeys_in_dom(combined, state))
+    # ['bedroom_0-0', 'bedroom_1-0'] # state.objs.items()
+    # ['195935_BedFactory', '198585_SimpleBookcaseFactory', '289804_FloorLampFactory', '310956_SimpleBookcaseFactory', '354075_SingleCabinetFactory', '651706_LargePlantContainerFactory', '874227_SimpleBookcaseFactory', '968015_SingleCabinetFactory']
 
     candidates = [
         c for c in candidates if t.Semantics.NoChildren not in state.objs[c].tags

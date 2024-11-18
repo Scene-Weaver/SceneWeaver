@@ -188,14 +188,12 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
                     }
                     bpy.ops.view3d.view_all(override)
     # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-              
+
     def solve_large():
-       
         assignments = greedy.iterate_assignments(
             stages["on_floor"], state, all_vars, limits, nonempty=True
         )
         for i, vars in enumerate(assignments):
-          
             solver.solve_objects(
                 consgraph,
                 stages["on_floor"],
@@ -203,7 +201,7 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
                 n_steps=overrides["solve_steps_large"],
                 desc=f"on_floor_{i}",
                 abort_unsatisfied=overrides.get("abort_unsatisfied_large", False),
-                expand_collision=True
+                expand_collision=True,
             )
             # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
         return solver.state
@@ -221,10 +219,9 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
         mesh.hide_viewport = True
         # invisible_to_camera.apply(mesh.objects)
         return
-    
+
     # p.run_stage("invisible_others", invisible_others, use_chance=False)
     # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-
 
     state = p.run_stage("solve_large", solve_large, use_chance=False, default=state)
     # p.run_stage("invisible_others", invisible_others, use_chance=False)
@@ -280,6 +277,7 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
         return scene_preprocessed
 
     scene_preprocessed = p.run_stage("pose_cameras", pose_cameras, use_chance=False)
+
     # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
     def animate_cameras():
         cam_util.animate_cameras(camera_rigs, solved_bbox, scene_preprocessed, pois=[])
@@ -323,7 +321,7 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
 
     def solve_small():
         n_steps = overrides["solve_steps_small"]
-       
+
         for i, vars in enumerate(
             greedy.iterate_assignments(stages["obj_ontop_obj"], state, all_vars, limits)
         ):
@@ -612,9 +610,11 @@ if __name__ == "__main__":
                 continue
             if len(args.debug) == 0 or any(name.endswith(x) for x in args.debug):
                 logging.getLogger(name).setLevel(logging.DEBUG)
-    
+
     import match
+
     match.debug()
     import pdb
+
     pdb.set_trace()
     main(args)

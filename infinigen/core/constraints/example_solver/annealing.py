@@ -192,9 +192,8 @@ class SimulatedAnnealingSolver:
         state: State,
         temp: float,
         filter_domain: r.Domain,
-        expand_collision = False
+        expand_collision=False,
     ) -> typing.Tuple[Move, evaluator.EvalResult, int]:
- 
         move_gen = propose_func(consgraph, state, filter_domain, temp)
 
         move = None
@@ -206,8 +205,8 @@ class SimulatedAnnealingSolver:
                     f"{move_gen=} reached {self.max_invalid_candidates=} without succeeding an apply()"
                 )
                 break  # 退出循环
-  
-            succeeded = move.apply(state,expand_collision)  # 尝试应用移动到当前状态
+
+            succeeded = move.apply(state, expand_collision)  # 尝试应用移动到当前状态
             if succeeded:  # 如果成功应用
                 evaluator.evict_memo_for_move(consgraph, state, self.eval_memo, move)
                 result = self.evaluate_move(consgraph, state, move, filter_domain)
@@ -256,7 +255,9 @@ class SimulatedAnnealingSolver:
         result["accept"] = rv < log_prob
         return result
 
-    def step(self, consgraph, state, move_gen_func, filter_domain,expand_collision=False):
+    def step(
+        self, consgraph, state, move_gen_func, filter_domain, expand_collision=False
+    ):
         if self.curr_result is None:
             self.curr_result = evaluator.evaluate_problem(
                 consgraph, state, filter_domain

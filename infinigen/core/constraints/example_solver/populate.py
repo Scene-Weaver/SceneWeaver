@@ -88,8 +88,8 @@ def populate_state_placeholders(state: State, filter=None, final=True):
 
         *_, inst_seed = parse_asset_name(placeholder.name)
         print(placeholder.name)
-        if "BookStackFactory" in  placeholder.name:
-            a =1 
+        if "BookStackFactory" in placeholder.name:
+            a = 1
 
         os.obj = os.generator.spawn_asset(
             i=int(inst_seed),

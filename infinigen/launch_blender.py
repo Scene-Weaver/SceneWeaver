@@ -22,8 +22,9 @@ APPEND_SYSPATH_SCRIPT = root / "infinigen/tools/blendscript_path_append.py"
 # 定义Blender无头模式（headless mode）运行时的参数
 HEADLESS_ARGS = [
     "-noaudio",  # 禁用音频
-    "--background", # 在后台模式运行
+    "--background",  # 在后台模式运行
 ]
+
 
 # 获取Blender可执行文件的路径
 def get_standalone_blender_path():
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--module", type=str, default=None)
     parser.add_argument("-s", "--script", type=str, default=None)
     args, unknown_args = parser.parse_known_args()
-    
+
     cmd_args = [str(get_standalone_blender_path())]
 
     if args.module is not None:
@@ -53,26 +54,27 @@ if __name__ == "__main__":
         # 将模块路径转换为Blender Python脚本路径
         relpath = "/".join(args.module.split(".")) + ".py"
         path = root / relpath
-        if not path.exists(): # 如果指定的Python脚本不存在，抛出文件未找到异常
+        if not path.exists():  # 如果指定的Python脚本不存在，抛出文件未找到异常
             raise FileNotFoundError(f"Could not find python script {path}")
         # 将模块脚本加入Blender运行的命令行参数
         cmd_args += ["--python", str(path)]
 
-    elif args.script is not None:# 如果指定了脚本参数
+    elif args.script is not None:  # 如果指定了脚本参数
         # 启动无头模式并指定要运行的Python脚本
         cmd_args += HEADLESS_ARGS + ["--python", args.script]
-    else:    # 如果没有指定模块或脚本，使用默认的Infinigen导入脚本
+    else:  # 如果没有指定模块或脚本，使用默认的Infinigen导入脚本
         cmd_args += ["--python", str(IMPORT_INFINIGEN_SCRIPT)]
 
     if len(unknown_args):
         cmd_args += unknown_args
     import pdb
+
     pdb.set_trace()
     print(" ".join(cmd_args))
 
     # 使用subprocess.run()运行命令
-    subprocess.run(cmd_args, cwd=root)# 在root目录下执行Blender
+    subprocess.run(cmd_args, cwd=root)  # 在root目录下执行Blender
 
 
 # python -m infinigen.launch_blender -m infinigen_examples.generate_indoors -- --seed 0 --task coarse --output_folder outputs/indoors/coarse -g fast_solve.gin overhead.gin singleroom.gin -p compose_indoors.terrain_enabled=False compose_indoors.overhead_cam_enabled=True compose_indoors.solve_max_rooms=1 compose_indoors.invisible_room_ceilings_enabled=True compose_indoors.restrict_single_supported_roomtype=True
-# python -m infinigen.launch_blender -m match.__init__ -- 
+# python -m infinigen.launch_blender -m match.__init__ --

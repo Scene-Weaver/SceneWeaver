@@ -92,7 +92,7 @@ def home_constraints():
 
     for k, v in params.items():
         print(f"{home_constraints.__name__} params - {k}: {v}")
-    
+
     # 根据房间内的家具占用比例来衡量“家具的完整度”或“家具的填充度”
     score_terms["furniture_fullness"] = rooms.mean(
         lambda r: (
@@ -104,7 +104,7 @@ def home_constraints():
             .minimize(weight=15)
         )
     )
-    #通过计算房间内物品（如家具）与其他物品（如装饰物或容器）之间的体积比率来优化物品的排列，从而确保物品在物品中的填充度符合预期。
+    # 通过计算房间内物品（如家具）与其他物品（如装饰物或容器）之间的体积比率来优化物品的排列，从而确保物品在物品中的填充度符合预期。
     score_terms["obj_in_obj_fullness"] = rooms.mean(
         lambda r: (
             furniture.related_to(r).mean(
@@ -114,7 +114,7 @@ def home_constraints():
                     .safediv(f.volume())
                     .sub(params["obj_interior_obj_pct"])
                     .abs()
-                    .minimize(weight=10) #计算填充度误差并最小化
+                    .minimize(weight=10)  # 计算填充度误差并最小化
                 )
             )
         )
@@ -158,30 +158,38 @@ def home_constraints():
     # endregion
 
     # region furniture
-    #衡量家具的美学评分或家具与环境的协调程度。考虑了家具与墙壁的距离、家具对可达性的影响等因素。
+    # 衡量家具的美学评分或家具与环境的协调程度。考虑了家具与墙壁的距离、家具对可达性的影响等因素。
     score_terms["furniture_aesthetics"] = wallfurn.mean(
         lambda t: (
-            t.distance(wallfurn) # 1. 计算家具到墙壁的距离
-            .hinge(0.2, 0.6) # 2. 使用 hinge 函数对该距离进行调整，可能是为了处理家具离墙壁过近或过远的情况
+            t.distance(wallfurn)  # 1. 计算家具到墙壁的距离
+            .hinge(
+                0.2, 0.6
+            )  # 2. 使用 hinge 函数对该距离进行调整，可能是为了处理家具离墙壁过近或过远的情况
             .maximize(weight=0.6)  # 3. 最大化调整后的距离，应用权重 0.6
-            + cl.accessibility_cost(t, furniture).minimize(weight=5) # 4. 计算家具对其他家具的可达性成本，并最小化，权重 5
-            + cl.accessibility_cost(t, rooms).minimize(weight=10) # 5. 计算家具对房间可达性成本，并最小化，权重 10
+            + cl.accessibility_cost(t, furniture).minimize(
+                weight=5
+            )  # 4. 计算家具对其他家具的可达性成本，并最小化，权重 5
+            + cl.accessibility_cost(t, rooms).minimize(
+                weight=10
+            )  # 5. 计算家具对房间可达性成本，并最小化，权重 10
         )
     )
-    #确保每个房间内的存储单元数量在一定的范围内（1到7个）
+    # 确保每个房间内的存储单元数量在一定的范围内（1到7个）
     constraints["storage"] = rooms.all(
         lambda r: (storage.related_to(r).count().in_range(1, 7))
     )
-    #评估存储空间与房间内家具和房间本身的可达性成本
+    # 评估存储空间与房间内家具和房间本身的可达性成本
     score_terms["storage"] = rooms.mean(
         lambda r: (
             cl.accessibility_cost(
-                storage.related_to(r), #表示与房间 r 相关的所有存储单元。
-                furniture.related_to(r), #表示与房间 r 相关的家具。
-                dist=0.5 #0.5 表示计算时考虑的最大距离阈值，超过此距离可能会增加可达性成本。
+                storage.related_to(r),  # 表示与房间 r 相关的所有存储单元。
+                furniture.related_to(r),  # 表示与房间 r 相关的家具。
+                dist=0.5,  # 0.5 表示计算时考虑的最大距离阈值，超过此距离可能会增加可达性成本。
             ).minimize(weight=5)
-            + cl.accessibility_cost(storage.related_to(r), r, dist=0.5).minimize(  #表示存储单元与房间本身之间的可达性。
-                weight=5 
+            + cl.accessibility_cost(
+                storage.related_to(r), r, dist=0.5
+            ).minimize(  # 表示存储单元与房间本身之间的可达性。
+                weight=5
             )
         )
     )
@@ -206,12 +214,12 @@ def home_constraints():
     walldec = obj[Semantics.WallDecoration].related_to(rooms, cu.flush_wall)
     wall_art = walldec[wall_decorations.WallArtFactory]
     mirror = walldec[wall_decorations.MirrorFactory]
-    rugs = obj[elements.RugFactory].related_to(rooms, cu.on_floor) #地毯
+    rugs = obj[elements.RugFactory].related_to(rooms, cu.on_floor)  # 地毯
 
     # 确保房间中所有的地毯（rugs）之间的距离大于或等于 1
     constraints["rugs"] = rooms.all(lambda r: (rugs.related_to(r).distance(rugs) >= 1))
 
-    #为 rugs（地毯）设置一个与房间（rooms）相关的约束，
+    # 为 rugs（地毯）设置一个与房间（rooms）相关的约束，
     # 确保每个房间中的地毯（rugs）与其“中心稳定表面”（center_stable_surface_dist）的距离最小化
     score_terms["rugs"] = rooms.all(
         lambda r: (cl.center_stable_surface_dist(rugs.related_to(r)).minimize(weight=1))
@@ -220,34 +228,50 @@ def home_constraints():
     def vertical_diff(o, r):
         return (o.distance(r, cu.floortags) - o.distance(r, cu.ceilingtags)).abs()
 
-    #确保在每个房间（rooms）中，墙面装饰物符合一定的数量和距离要求
+    # 确保在每个房间（rooms）中，墙面装饰物符合一定的数量和距离要求
     constraints["wall_decorations"] = rooms.all(
         lambda r: (
             wall_art.related_to(r).count().in_range(0, 6)
             * mirror.related_to(r).count().in_range(0, 1)
-            * walldec.related_to(r).all(lambda t: t.distance(r, cu.floortags) > 0.6) #墙面装饰物（walldec）必须距离地面标签（floortags）超过 0.6。
+            * walldec.related_to(r).all(
+                lambda t: t.distance(r, cu.floortags) > 0.6
+            )  # 墙面装饰物（walldec）必须距离地面标签（floortags）超过 0.6。
             # walldec.all(lambda t: (
             #    (vertical_diff(t, r).abs() < 1.5) *
             #    (t.distance(cutters) > 0.1)
             # ))
         )
     )
-    #优化墙面装饰物的位置、角度、距离和可访问性等属性。
+    # 优化墙面装饰物的位置、角度、距离和可访问性等属性。
     score_terms["wall_decorations"] = rooms.mean(
         lambda r: (
             walldec.related_to(r).mean(
                 lambda w: (
-                    vertical_diff(w, r).abs().minimize(weight=1) #计算墙面装饰物 w 与房间 r 之间的垂直差异（可能是指墙面装饰物的垂直位置与房间的位置的差异）。
-                    + w.distance(walldec).maximize(weight=1) #计算墙面装饰物 w 与所有其他墙面装饰物之间的距离。
-                    + w.distance(window).hinge(0.25, 10).maximize(weight=1) #墙面装饰物 w 与窗户（window）之间的距离。
-                    + cl.angle_alignment_cost(w, r, cu.floortags).minimize(weight=5) #确保墙面装饰物的角度与房间或地面标签对齐。
-                    + cl.accessibility_cost(w, furniture, dist=1).minimize(weight=5) #确保墙面装饰物不会阻碍家具的可访问性。
-                    + cl.center_stable_surface_dist(w).minimize(weight=1)  #计算墙面装饰物 w 到中心稳定表面（如地面或天花板）的距离。
+                    vertical_diff(w, r)
+                    .abs()
+                    .minimize(
+                        weight=1
+                    )  # 计算墙面装饰物 w 与房间 r 之间的垂直差异（可能是指墙面装饰物的垂直位置与房间的位置的差异）。
+                    + w.distance(walldec).maximize(
+                        weight=1
+                    )  # 计算墙面装饰物 w 与所有其他墙面装饰物之间的距离。
+                    + w.distance(window)
+                    .hinge(0.25, 10)
+                    .maximize(weight=1)  # 墙面装饰物 w 与窗户（window）之间的距离。
+                    + cl.angle_alignment_cost(w, r, cu.floortags).minimize(
+                        weight=5
+                    )  # 确保墙面装饰物的角度与房间或地面标签对齐。
+                    + cl.accessibility_cost(w, furniture, dist=1).minimize(
+                        weight=5
+                    )  # 确保墙面装饰物不会阻碍家具的可访问性。
+                    + cl.center_stable_surface_dist(w).minimize(
+                        weight=1
+                    )  # 计算墙面装饰物 w 到中心稳定表面（如地面或天花板）的距离。
                 )
             )
         )
     )
-    #优化房间内地毯或地毯类物品（rugs）与房间和墙面标签（walltags）的相对位置、角度等。
+    # 优化房间内地毯或地毯类物品（rugs）与房间和墙面标签（walltags）的相对位置、角度等。
     score_terms["floor_covering"] = rugs.mean(
         lambda rug: (
             rug.distance(rooms, cu.walltags).maximize(weight=3)
@@ -835,8 +859,8 @@ def home_constraints():
             )
         )
     )
-    #评估客厅中各个元素（如咖啡桌和沙发）的位置、距离、对齐等因素，确保客厅布局的合理性。
-    #这段代码主要处理咖啡桌（coffeetables）和沙发（sofas）之间的关系，并优化它们的位置
+    # 评估客厅中各个元素（如咖啡桌和沙发）的位置、距离、对齐等因素，确保客厅布局的合理性。
+    # 这段代码主要处理咖啡桌（coffeetables）和沙发（sofas）之间的关系，并优化它们的位置
     score_terms["livingroom"] = livingrooms.mean(
         lambda r: (
             coffeetables.related_to(r).mean(
@@ -851,12 +875,13 @@ def home_constraints():
             )
         )
     )
-    #检查和约束客厅内各种物品（如储物柜和咖啡桌）的位置关系和数量
+    # 检查和约束客厅内各种物品（如储物柜和咖啡桌）的位置关系和数量
     constraints["livingroom_objects"] = livingrooms.all(
         lambda r: (
             storage.all(
                 lambda t: (
-                    obj[Semantics.OfficeShelfItem].related_to(t, cu.on).count() >= 0 # 计算与咖啡桌 t 上面相关联的 TableDisplayItem 数量。
+                    obj[Semantics.OfficeShelfItem].related_to(t, cu.on).count()
+                    >= 0  # 计算与咖啡桌 t 上面相关联的 TableDisplayItem 数量。
                 )
             )
             * coffeetables.all(
@@ -950,12 +975,16 @@ def home_constraints():
     )
     score_terms["diningroom"] = diningrooms.mean(
         lambda r: (
-            diningtables.related_to(r).distance(r, cu.walltags).maximize(weight=10) #最大化餐桌与墙面的距离
+            diningtables.related_to(r)
+            .distance(r, cu.walltags)
+            .maximize(weight=10)  # 最大化餐桌与墙面的距离
             + cl.angle_alignment_cost(
                 diningtables.related_to(r), r, cu.walltags
-            ).minimize(weight=10) #餐桌与餐厅墙面对齐
-            + cl.center_stable_surface_dist(diningtables.related_to(r)).minimize( #餐桌中心到稳定表面（可能是墙面或地面等）之间的距离。
-                weight=1 
+            ).minimize(weight=10)  # 餐桌与餐厅墙面对齐
+            + cl.center_stable_surface_dist(
+                diningtables.related_to(r)
+            ).minimize(  # 餐桌中心到稳定表面（可能是墙面或地面等）之间的距离。
+                weight=1
             )
         )
     )
@@ -1014,7 +1043,7 @@ def home_constraints():
 
     # region MISC OBJECTS
 
-    #根据是否有 "aquarium_tank"（水族箱）这一需求来定义和约束水族箱在空间中的布局和评分
+    # 根据是否有 "aquarium_tank"（水族箱）这一需求来定义和约束水族箱在空间中的布局和评分
     if params["has_aquarium_tank"]:
 
         def aqtank(r):

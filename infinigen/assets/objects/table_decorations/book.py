@@ -25,26 +25,32 @@ from infinigen.core.util.random import log_uniform
 class BookFactory(AssetFactory):
     def __init__(self, factory_seed, coarse=False):
         super(BookFactory, self).__init__(factory_seed, coarse)
-        self.rel_scale = log_uniform(1, 1.5) # 设置相对缩放因子（使用对数均匀分布）
-        self.skewness = log_uniform(1.3, 1.8) # 设置纵横比（使用对数均匀分布）
-        self.unit = 0.0127 # 定义单位尺度
-        self.is_paperback = uniform() < 0.5 # 随机选择是纸质封面还是硬封面
-        self.margin = uniform(0.005, 0.01) # 设置封面边距
-        self.offset = 0 if uniform() < 0.5 else log_uniform(0.002, 0.008)# 设置偏移量
+        self.rel_scale = log_uniform(1, 1.5)  # 设置相对缩放因子（使用对数均匀分布）
+        self.skewness = log_uniform(1.3, 1.8)  # 设置纵横比（使用对数均匀分布）
+        self.unit = 0.0127  # 定义单位尺度
+        self.is_paperback = uniform() < 0.5  # 随机选择是纸质封面还是硬封面
+        self.margin = uniform(0.005, 0.01)  # 设置封面边距
+        self.offset = 0 if uniform() < 0.5 else log_uniform(0.002, 0.008)  # 设置偏移量
         self.thickness = uniform(0.002, 0.003)  # 设置封面厚度
 
         # 获取材质列表并为封面和书面分配材质
         materials = AssetList["BookFactory"]()
-        self.surface = materials["surface"].assign_material() # 为表面分配材质
-        self.cover_surface = materials["cover_surface"].assign_material()  # 为封面分配材质
+        self.surface = materials["surface"].assign_material()  # 为表面分配材质
+        self.cover_surface = materials[
+            "cover_surface"
+        ].assign_material()  # 为封面分配材质
         # 如果封面材质是文本，进行特殊处理
         if self.cover_surface == text.Text:
             self.cover_surface = self.cover_surface(self.factory_seed)
         # 获取磨损概率，并根据概率为磨损赋值
         scratch_prob, edge_wear_prob = materials["wear_tear_prob"]
         self.scratch, self.edge_wear = materials["wear_tear"]
-        self.scratch = None if uniform() > scratch_prob else self.scratch # 根据概率是否应用磨损
-        self.edge_wear = None if uniform() > edge_wear_prob else self.edge_wear # 根据概率是否应用边缘磨损
+        self.scratch = (
+            None if uniform() > scratch_prob else self.scratch
+        )  # 根据概率是否应用磨损
+        self.edge_wear = (
+            None if uniform() > edge_wear_prob else self.edge_wear
+        )  # 根据概率是否应用边缘磨损
         # 设置是否共享纹理
         self.texture_shared = uniform() < 0.2
 
@@ -56,25 +62,24 @@ class BookFactory(AssetFactory):
         # 根据是否是纸质书籍选择生成对应的资产
         fn = self.make_paperback if self.is_paperback else self.make_hardcover
         # noinspection PyArgumentList
-        obj = fn(width, height, depth)# 生成书籍对象
+        obj = fn(width, height, depth)  # 生成书籍对象
         # from infinigen.tools.export import bake_object,bake_metal
         # from pathlib import Path
 
         # bake_object(obj,Path("/home/yandan/workspace/infinigen/debug"),1024,"usdc")
-        
 
         return obj
-    
+
     # 完成资产的最后处理，例如应用磨损效果
     def finalize_assets(self, assets):
         if self.scratch:
-            self.scratch.apply(assets) # 应用磨损效果
+            self.scratch.apply(assets)  # 应用磨损效果
         if self.edge_wear:
-            self.edge_wear.apply(assets) # 应用边缘磨损效果
+            self.edge_wear.apply(assets)  # 应用边缘磨损效果
 
     # 生成纸质书籍的函数
     def make_paperback(self, width, height, depth):
-        paper = self.make_paper(depth, height, width) # 创建纸张
+        paper = self.make_paper(depth, height, width)  # 创建纸张
         obj = new_cube()
         obj.location = width / 2, height / 2, depth / 2
         obj.scale = width / 2, height / 2, depth / 2
@@ -89,11 +94,11 @@ class BookFactory(AssetFactory):
                     geom.append(e)
             bmesh.ops.delete(bm, geom=geom, context="EDGES")
 
-        self.make_cover(obj) # 创建封面
-        write_attribute(obj, 1, "cover", "FACE") # 给封面面写属性
-        obj = join_objects([paper, obj]) # 将纸张和对象合并
+        self.make_cover(obj)  # 创建封面
+        write_attribute(obj, 1, "cover", "FACE")  # 给封面面写属性
+        obj = join_objects([paper, obj])  # 将纸张和对象合并
         return obj
-    
+
     # 生成纸张的函数
     def make_paper(self, depth, height, width):
         paper = new_cube()
@@ -102,12 +107,12 @@ class BookFactory(AssetFactory):
         butil.apply_transform(paper, True)
         self.surface.apply(paper)
         return paper
-    
+
     # 生成硬封面的函数
     def make_hardcover(self, width, height, depth):
         paper = self.make_paper(depth, height, width)  # 生成纸张
         obj = new_cube()
-        count = 8 # 设置数量，表示重复的次数
+        count = 8  # 设置数量，表示重复的次数
         butil.modify_mesh(
             obj,
             "ARRAY",
@@ -123,8 +128,8 @@ class BookFactory(AssetFactory):
             geom = []
             for v in bm.verts:
                 if v.co[0] > 0 and 0 < v.co[-1] < count * 2:
-                    geom.append(v)# 满足条件的顶点加入 geom 列表
-            bmesh.ops.delete(bm, geom=geom, context="VERTS")# 删除这些顶点
+                    geom.append(v)  # 满足条件的顶点加入 geom 列表
+            bmesh.ops.delete(bm, geom=geom, context="VERTS")  # 删除这些顶点
         obj.location = 0, -self.margin, 0
         obj.scale = (
             (width + self.margin) / 2,
@@ -135,8 +140,8 @@ class BookFactory(AssetFactory):
         x, y, z = read_co(obj).T
         ratio = np.minimum(z / depth, 1 - z / depth)
         x -= 4 * ratio * (1 - ratio) * self.offset
-        write_co(obj, np.stack([x, y, z]).T)# 写回调整后的坐标
-        self.make_cover(obj) # 创建封面
+        write_co(obj, np.stack([x, y, z]).T)  # 写回调整后的坐标
+        self.make_cover(obj)  # 创建封面
         butil.modify_mesh(obj, "SOLIDIFY", thickness=self.thickness)
         write_attribute(obj, 1, "cover", "FACE")
         obj = join_objects([paper, obj])
@@ -145,7 +150,9 @@ class BookFactory(AssetFactory):
     def make_cover(self, obj):
         obj.rotation_euler[0] = np.pi / 2
         butil.apply_transform(obj)
-        wrap_front_back_side(obj, self.cover_surface, self.texture_shared)  # 包裹前后封面
+        wrap_front_back_side(
+            obj, self.cover_surface, self.texture_shared
+        )  # 包裹前后封面
         obj.rotation_euler[0] = -np.pi / 2
         butil.apply_transform(obj)
 

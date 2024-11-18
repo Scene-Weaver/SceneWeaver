@@ -10,6 +10,7 @@ from infinigen.assets.objects import (
     decor,
     elements,
     lamp,
+    objaverse,
     seating,
     shelves,
     table_decorations,
@@ -17,8 +18,6 @@ from infinigen.assets.objects import (
     tableware,
     wall_decorations,
     windows,
-    objaverse
-    
 )
 from infinigen.core.tags import Semantics
 
@@ -106,12 +105,9 @@ def home_asset_usage():
         used_as[Semantics.OfficeShelfItem],
         used_as[Semantics.ClothDrapeItem],
         used_as[Semantics.Dishware],
-
     )
 
-    used_as[Semantics.Objaverse] = {
-        objaverse.ObjaverseFactory
-    }
+    used_as[Semantics.Objaverse] = {objaverse.ObjaverseFactory}
 
     # endregion
 

@@ -169,7 +169,6 @@ class LampFactory(AssetFactory):
             return params
 
     def create_asset(self, i, **params):
-      
         obj = butil.spawn_cube()
         # 调用butil.modify_mesh()方法修改该对象的网格
         butil.modify_mesh(
@@ -177,7 +176,7 @@ class LampFactory(AssetFactory):
             "NODES",
             node_group=nodegroup_lamp_geometry(),
             ng_inputs=self.params,
-            apply=True, # 是否应用修改
+            apply=True,  # 是否应用修改
         )
 
         if np.random.uniform() < 0.6:
@@ -187,7 +186,7 @@ class LampFactory(AssetFactory):
             butil.parent_to(bulb, obj, no_inverse=True, no_transform=True)
             # 调整灯泡的位置，z坐标设置为obj的边界框最高点减去ShadeHeight的一半
             bulb.location.z = obj.bound_box[-2][2] - self.params["ShadeHeight"] * 0.5
-            
+
         # 选择对象并将其设置为平面阴影模式（flat shading）
         with butil.SelectObjects(obj):
             bpy.ops.object.shade_flat()
@@ -835,7 +834,7 @@ def nodegroup_lamp_geometry(nw: NodeWrangler):
         Nodes.CurveCircle,
         input_kwargs={"Radius": group_input.outputs["BaseRadius"], "Resolution": 100},
     )
-     # 将曲线转为网格
+    # 将曲线转为网格
     curve_to_mesh_1 = nw.new_node(
         Nodes.CurveToMesh,
         input_kwargs={

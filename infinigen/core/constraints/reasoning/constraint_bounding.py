@@ -170,9 +170,11 @@ def constraint_bounds(node: cl.Node, state=None) -> list[Bound]:
     recurse = partial(constraint_bounds, state=state)
 
     match node:
-        case cl.Problem(cons): # 如果node是cl.Problem类型，且其值为cons
+        case cl.Problem(cons):  # 如果node是cl.Problem类型，且其值为cons
             return sum((recurse(c) for c in cons.values()), [])
-        case cl.BoolOperatorExpression(operator.and_, cons):  # 如果node是一个布尔运算表达式，且是‘与’操作符
+        case cl.BoolOperatorExpression(
+            operator.and_, cons
+        ):  # 如果node是一个布尔运算表达式，且是‘与’操作符
             return sum((recurse(c) for c in cons), [])
         case cl.in_range(val, low, high):
             low = update_var(low, state)
@@ -194,7 +196,9 @@ def constraint_bounds(node: cl.Node, state=None) -> list[Bound]:
             bound = Bound.from_comparison(node.func, lhs, rhs)
             expr = rhs if is_constant(lhs) else lhs
             return expression_map_bound(expr, bound)
-        case cl.ForAll(objs, varname, pred):  # 如果node是ForAll类型，表示遍历所有对象并应用条件
+        case cl.ForAll(
+            objs, varname, pred
+        ):  # 如果node是ForAll类型，表示遍历所有对象并应用条件
             o_domain = constraint_domain(objs)
             bounds = recurse(pred)
             for b in bounds:

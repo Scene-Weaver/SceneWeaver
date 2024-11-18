@@ -68,7 +68,7 @@ class AssetFactory:
         pass
 
     def spawn_placeholder(self, i, loc, rot):
-        #生成一个占位符对象（placeholder），并根据条件进行位置、旋转等属性的调整
+        # 生成一个占位符对象（placeholder），并根据条件进行位置、旋转等属性的调整
         # Not intended to be overridden - override create_placeholder instead
         # 函数内还会对某些特殊约束（例如沿路径跟随的约束）做处理，确保对象的正确位置。
 
@@ -88,7 +88,7 @@ class AssetFactory:
                 f"Not assigning placeholder {obj.name=} location due to presence of"
                 "location-sensitive constraint, typically a follow curve"
             )
-        obj.name = f"{repr(self)}.spawn_placeholder({i})" #'BedFactory(5615189).spawn_placeholder(2274623)'
+        obj.name = f"{repr(self)}.spawn_placeholder({i})"  #'BedFactory(5615189).spawn_placeholder(2274623)'
 
         if obj.parent is not None:
             logger.warning(
@@ -142,7 +142,9 @@ class AssetFactory:
         ]
 
         with (
-            FixedSeed(int_hash((self.factory_seed, i))), # 固定随机种子，确保每次生成结果相同
+            FixedSeed(
+                int_hash((self.factory_seed, i))
+            ),  # 固定随机种子，确保每次生成结果相同
             butil.GarbageCollect(gc_targets, verbose=False),  # 垃圾回收
         ):
             # 获取资产的参数，这些参数用于资产生成

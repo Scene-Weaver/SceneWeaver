@@ -101,7 +101,6 @@ def check_post_move_validity(
     expand_collision=False,
 ):  # MARK
     # import pdb
-
     # pdb.set_trace()
     scene = state.trimesh_scene
     objstate = state.objs[name]

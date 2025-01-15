@@ -31,6 +31,7 @@ class ContourFactory:
         self.n_trials = 1000
 
     def make_contour(self, i):
+        #随机生成一个带有不同角特征（长角、圆角、直角、锐角）的多边形轮廓
         with FixedSeed(i):
             obj = new_plane()
             obj.location = self.width / 2, self.height / 2, 0
@@ -54,6 +55,7 @@ class ContourFactory:
             while len(corners) > 0:
                 _, (x, y) = corners.popitem()
                 r = uniform(0, 1)
+                # 如果随机值小于 0.2，尝试添加长角。
                 if r < 0.2:
                     axes = []
                     if nearest((self.width - x, y))[1] < 0.1:
@@ -65,15 +67,39 @@ class ContourFactory:
                         self.add_long_corner(obj, x, y, axis)
                         t = (self.width - x, y) if axis == 0 else (x, self.height - y)
                         corners.pop(nearest(t)[0])
+                # 如果随机值在 0.2 和 0.35 之间，添加圆角。
                 elif r < 0.35:
                     self.add_round_corner(obj, x, y)
+                # 如果随机值在 0.35 和 0.5 之间，添加直角。 
                 elif r < 0.5:
                     self.add_straight_corner(obj, x, y)
+                # 如果随机值在 0.5 和 0.65 之间，添加锐角。
                 elif r < 0.65:
                     self.add_sharp_corner(obj, x, y)
-
+            # 获取平面的顶点数据并生成一个多边形。
             vertices = obj.data.polygons[0].vertices
-            p = Polygon(read_co(obj)[:, :2][vertices])
+            p = Polygon(read_co(obj)[:, :2][vertices]) # 创建 2D 多边形。
+            butil.delete(obj)
+            return p
+        
+    def make_contour_singleroom(self, i):
+        #随机生成一个带有不同角特征（长角、圆角、直角、锐角）的多边形轮廓
+        with FixedSeed(i):
+            obj = new_plane()
+            obj.location = self.width / 2, self.height / 2, 0
+            obj.scale = self.width / 2, self.height / 2, 1
+            butil.apply_transform(obj, loc=True)
+            corners = list(
+                (x, y)
+                for x in [0, unit_cast(self.width)]
+                for y in [0, unit_cast(self.height)]
+            )
+            random.shuffle(corners)
+            corners = dict(enumerate(corners))
+
+            # 获取平面的顶点数据并生成一个多边形。
+            vertices = obj.data.polygons[0].vertices
+            p = Polygon(read_co(obj)[:, :2][vertices]) # 创建 2D 多边形。
             butil.delete(obj)
             return p
 

@@ -39,11 +39,13 @@ class RoomSolver:
         self.factory_seed = factory_seed
         with FixedSeed(factory_seed):
             self.graph_maker = GraphMaker(factory_seed)
-            self.graph = self.graph_maker.make_graph(np.random.randint(1e7))
+            # self.graph = self.graph_maker.make_graph(np.random.randint(1e7))
+            self.graph = self.graph_maker.make_graph_singleroom(np.random.randint(1e7))
             self.width, self.height = self.graph_maker.suggest_dimensions(self.graph)
             self.contour_factory = ContourFactory(self.width, self.height)
-            self.contour = self.contour_factory.make_contour(np.random.randint(1e7))
-
+            # self.contour = self.contour_factory.make_contour(np.random.randint(1e7))
+            self.contour = self.contour_factory.make_contour_singleroom(np.random.randint(1e7))
+            
             n = len(self.graph.neighbours)
 
             self.segment_maker = SegmentMaker(self.factory_seed, self.contour, n)
@@ -56,11 +58,22 @@ class RoomSolver:
             self.score_scale = 5
 
     def simulated_anneal(self, assignment, info):
+        """
+        模拟退火算法（Simulated Annealing）用于优化房间分配方案。
+        参数：
+        - assignment: 当前房间的分配方案。
+        - info: 包含几何和关系信息的字典。
+        
+        返回：
+        - assignment: 优化后的房间分配方案。
+        - info: 更新后的房间信息。
+        """
         score = self.scorer.find_score(assignment, info)
         with tqdm(total=self.iterations, desc="Sampling solutions") as pbar:
             while pbar.n < self.iterations:
                 assignment_, info_ = deepcopy(assignment), deepcopy(info)
-                resp = self.solver.perturb_solution(assignment_, info_)
+                # resp = self.solver.perturb_solution(assignment_, info_)
+                resp = self.solver.perturb_solution_singleroom(assignment_, info_)
                 if not resp.is_success:
                     continue
                 pbar.update(1)

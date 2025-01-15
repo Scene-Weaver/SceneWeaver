@@ -136,6 +136,15 @@ class BlueprintSolver:
         return RoomSolverMsg("success")
 
     def perturb_solution(self, assignment, info):
+        """
+        扰动当前房间分布的解，通过随机操作（外扩、内缩、交换房间等）来生成新解。
+        参数:
+        - assignment: 当前的房间分配信息。
+        - info: 包含几何和关系信息的字典。
+
+        返回:
+        - 一个表示扰动结果的 RoomSolverMsg 或其他响应对象。
+        """
         k = np.random.choice(list(info["segments"].keys()))
         while True:
             info_ = deepcopy(info)
@@ -186,8 +195,49 @@ class BlueprintSolver:
         if not satisfies.is_success:
             return satisfies
         return resp
+    
+    def perturb_solution_singleroom(self, assignment, info):
+        """
+        扰动当前房间分布的解，通过随机操作（外扩、内缩、交换房间等）来生成新解。
+        参数:
+        - assignment: 当前的房间分配信息。
+        - info: 包含几何和关系信息的字典。
+
+        返回:
+        - 一个表示扰动结果的 RoomSolverMsg 或其他响应对象。
+        """
+        
+        resp = RoomSolverMsg("success")
+        
+        info["neighbours_all"] = {
+            k: set(compute_neighbours(se, SEGMENT_MARGIN))
+            for k, se in info["shared_edges"].items()
+        }
+        info["exterior_neighbours"] = set(
+            compute_neighbours(info["exterior_edges"], SEGMENT_MARGIN)
+        )
+        for k, s in info["segments"].items():
+            x, y = np.array(s.boundary.coords).T
+            if np.any((x < -1.0) | (y < -1.0) | (x > 40.0) | (y > 40.0)):
+                return RoomSolverMsg("OOB")
+        satisfies = self.satisfies_constraints(assignment, info)
+        if not satisfies.is_success:
+            return satisfies
+        return resp
 
     def extrude_room(self, i, info, out=True):
+        """
+        根据房间边界的某一部分进行外延或内缩操作，生成一个新的几何形状。
+        参数:
+        - i: 房间的索引，用于从 info["segments"] 中获取对应的几何形状。
+        - info: 包含几何和其他信息的字典。
+        - out: 是否向外扩展，默认为向外。
+
+        返回:
+        - s: 新的多边形几何体。
+        - line: 选择的边界线。
+        - is_vertical: 选择的边界是否为垂直线。
+        """
         segments = info["segments"]
         coords = canonicalize(segments[i]).boundary.coords[:]
         indices = []

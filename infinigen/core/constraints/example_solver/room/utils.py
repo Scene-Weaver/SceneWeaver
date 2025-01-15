@@ -39,37 +39,52 @@ def is_valid_polygon(p):
 
 
 def canonicalize(p):
-    p = p.buffer(0)
+    # 修正多边形的几何问题（例如自交或无效的多边形）
+    p = p.buffer(0) # 使用 buffer(0) 修复可能的几何问题
     try:
-        while True:
+        while True:  # 不断迭代，直到多边形满足要求
+             # 简化多边形并强制为2D
             p_ = shapely.force_2d(simplify_polygon(p))
-            l = len(p.boundary.coords)
-            if p.area == 0:
+            l = len(p.boundary.coords)# 获取边界坐标的数量
+            if p.area == 0:# 如果多边形面积为0，抛出异常
                 raise NotImplementedError("Polygon empty.")
+             # 规范多边形方向（顺时针或逆时针）
             p = orient(p_)
+            # 获取边界的坐标并转换为NumPy数组
             coords = np.array(p.boundary.coords[:])
+            # 将坐标舍入到单位网格（通过常量UNIT控制精度）
             rounded = np.round(coords / constants.UNIT) * constants.UNIT
+            # 检查坐标是否接近舍入值，如果接近则使用舍入值
             coords = np.where(
                 np.all(np.abs(coords - rounded) < 1e-3, -1)[:, np.newaxis],
                 rounded,
                 coords,
             )
+            # 计算相邻点之间的差值向量
             diff = coords[1:] - coords[:-1]
+            # 归一化差值向量，避免数值问题
             diff = diff / (np.linalg.norm(diff, axis=-1, keepdims=True) + 1e-6)
+            # 计算相邻向量之间的点积，检测chui直线性
             product = (diff[[-1] + list(range(len(diff) - 1))] * diff).sum(-1)
+             # 初始化有效的索引（所有点）
             valid_indices = list(range(len(coords) - 1))
+            # 找到无效的点索引（点积过小或接近1）
             invalid_indices = np.nonzero((product < -0.8) | (product > 1 - 1e-6))[
                 0
             ].tolist()
+            # 如果存在无效点，移除其中一个（取中间点）
             if len(invalid_indices) > 0:
                 i = invalid_indices[len(invalid_indices) // 2]
                 valid_indices.remove(i)
+            # 根据有效点重新构造多边形
             p = shapely.Polygon(coords[valid_indices + [valid_indices[0]]])
+            # 如果边界坐标数量未发生变化，结束循环
             if len(p.exterior.coords) == l:
                 break
+        # 检查多边形是否有效，如果无效则抛出异常
         if not is_valid_polygon(p):
             raise NotImplementedError("Invalid polygon")
-        return p
+        return p # 返回规范化后的多边形
     except AttributeError:
         raise NotImplementedError("Invalid multi polygon")
 

@@ -47,7 +47,7 @@ class Semantics(EnumTag):
     DiningRoom = "dining-room"
     Utility = "utility"
     Staircase = "staircase"
-    Office = "office"
+    NewRoom = "newroom"
 
     # Object types
     Furniture = "furniture"

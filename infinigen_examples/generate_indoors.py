@@ -156,7 +156,7 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
                     # Only these roomtypes have constraints written in home_constraints.
                     # Others will be empty-ish besides maybe storage and plants
                     # TODO: add constraints to home_constraints for garages, offices, balconies, etc
-                    t.Semantics.Office,
+                    t.Semantics.NewRoom,
                     # t.Semantics.Bedroom,
                     # t.Semantics.LivingRoom,
                     # t.Semantics.Kitchen,
@@ -188,7 +188,16 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
                         "edit_object": bpy.context.edit_object,
                     }
                     bpy.ops.view3d.view_all(override)
+    
+    
     # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+    def init_graph():
+        solver.init_graph()
+            # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+        return solver.state
+    
+    state = p.run_stage("init_graph", init_graph, use_chance=False, default=state)
+
 
     def solve_large():
         assignments = greedy.iterate_assignments(

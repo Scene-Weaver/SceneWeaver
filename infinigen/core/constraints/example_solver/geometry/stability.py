@@ -195,43 +195,55 @@ def stable_against(
 def snap_against(scene, a, b, a_plane, b_plane, margin=0):
     """
     snap a against b with some margin.
+    将对象 `a` 对齐到对象 `b` 的指定平面上，同时允许指定一个间距（margin）。
+    参数：
+    - scene: Blender 场景对象，用于操作。
+    - a: 对象 `a` 的名称。
+    - b: 对象 `b` 的名称。
+    - a_plane: 对象 `a` 的平面定义，包含平面索引信息。
+    - b_plane: 对象 `b` 的平面定义，包含平面索引信息。
+    - margin: 对齐时的间距（单位为 Blender 的单位）。
     """
     logging.debug("snap_against", a, b, a_plane, b_plane, margin)
 
     a_obj = bpy.data.objects[a]
     b_obj = bpy.data.objects[b]
-
+    # 从对象 `a` 和 `b` 的数据中提取平面（多边形）信息。
     a_poly_index = a_plane[1]
     a_poly = a_obj.data.polygons[a_poly_index]
     b_poly_index = b_plane[1]
     b_poly = b_obj.data.polygons[b_poly_index]
+    # 获取平面 `a` 和 `b` 上顶点的全局坐标。
     plane_point_a = iu.global_vertex_coordinates(
         a_obj, a_obj.data.vertices[a_poly.vertices[0]]
     )
+    # 获取平面 `a` 和 `b` 的法向量。
     plane_normal_a = iu.global_polygon_normal(a_obj, a_poly)
     plane_point_b = iu.global_vertex_coordinates(
         b_obj, b_obj.data.vertices[b_poly.vertices[0]]
     )
     plane_normal_b = iu.global_polygon_normal(b_obj, b_poly)
     plane_normal_b = -plane_normal_b
-
+    # 确保平面法向量的长度为 1，否则报错。
     norm_mag_a = np.linalg.norm(plane_normal_a)
     norm_mag_b = np.linalg.norm(plane_normal_b)
     assert np.isclose(norm_mag_a, 1), norm_mag_a
     assert np.isclose(norm_mag_b, 1), norm_mag_b
-
+    # 计算 `a` 和 `b` 的法向量之间的旋转轴。
     rotation_axis = np.cross(plane_normal_a, plane_normal_b)
     if not np.isclose(np.linalg.norm(rotation_axis), 0, atol=1e-05):
         rotation_axis = rotation_axis / np.linalg.norm(rotation_axis)
     else:
         rotation_axis = np.array([0, 0, 1])
-
+    # 计算两个法向量之间的夹角。
     dot = plane_normal_a.dot(plane_normal_b)
     rotation_angle = np.arccos(np.clip(dot, -1, 1))
     if np.isnan(rotation_angle):
         raise ValueError(f"Invalid {rotation_angle=}")
+    # 旋转对象 `a`，使其法向量与 `b` 的法向量对齐。
     iu.rotate(scene, a, rotation_axis, rotation_angle)
-
+    
+    # 更新对象 `a` 和其法向量信息（旋转后需重新计算）。
     a_obj = bpy.data.objects[a]
     a_poly = a_obj.data.polygons[a_poly_index]
     # Recalculate vertex_a and normal_a after rotation
@@ -239,9 +251,9 @@ def snap_against(scene, a, b, a_plane, b_plane, margin=0):
         a_obj, a_obj.data.vertices[a_poly.vertices[0]]
     )
     plane_normal_a = iu.global_polygon_normal(a_obj, a_poly)
-
+    # 计算平面 `a` 和 `b` 之间的距离（沿 `b` 平面法向量方向）。
     distance = (plane_point_a - plane_point_b).dot(plane_normal_b)
-
+    # 计算平移向量，将对象 `a` 移动到与 `b` 对齐的目标位置，并考虑指定的 `margin`。
     # Move object a by the average distance minus the margin in the direction of the plane normal of b
     translation = -(distance + margin) * plane_normal_b.normalized()
     iu.translate(scene, a, translation)

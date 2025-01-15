@@ -24,12 +24,14 @@ from infinigen.core.constraints.example_solver import (
 )
 from infinigen.core.constraints.example_solver.state_def import State
 from infinigen.core.util import blender as butil
+from infinigen.core.constraints.example_solver.propose_discrete import moves
 
 from .annealing import SimulatedAnnealingSolver
 from .room import MultistoryRoomSolver, RoomSolver
 
 logger = logging.getLogger(__name__)
 
+GLOBAL_GENERATOR_SINGLETON_CACHE = {}
 
 def map_range(x, xmin, xmax, ymin, ymax, exp=1):
     if x < xmin:
@@ -264,6 +266,40 @@ class Solver:
             greedy.set_active(self.state, k, True)
 
         return self.state
+
+    @gin.configurable
+    def init_graph(
+        self,
+    ):  
+        from infinigen.assets.objects import seating
+        from infinigen.core import tags as t
+        from infinigen.core import tags as t
+
+        gen_class = seating.SofaFactory
+        assignments = []
+
+        tags = {t.Semantics.LoungeSeating, t.Semantics.Furniture, t.Semantics.Seating, t.Semantics.Object, 
+                t.Semantics.PlaceholderBBox, -t.Semantics.Room, t.FromGenerator(seating.SofaFactory)}
+        
+        move = moves.Addition(
+            names=[
+                f"{np.random.randint(1e6):04d}_{gen_class.__name__}"
+            ],  # decided later # 随机生成一个名称，基于生成器类的名称
+            gen_class=gen_class,  # 使用传入的生成器类
+            relation_assignments=assignments,  # 传入分配的关系
+            temp_force_tags=tags,  # 临时强制标签
+        )
+
+        target_name = "945674_SofaFactory"
+        size = ""
+        position = [-10,-10,0]
+        orientation = ""
+        meshpath = ""
+        
+        move.apply_init(self.state, target_name, size, position, orientation, gen_class, meshpath)
+
+        return self.state
+
 
     def get_bpy_objects(self, domain: r.Domain) -> list[bpy.types.Object]:
         objkeys = domain_contains.objkeys_in_dom(domain, self.state)

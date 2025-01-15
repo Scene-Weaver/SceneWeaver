@@ -7,14 +7,15 @@ You will receive:
 1. The roomtype you need to design.
 
 You need to return a dict including:
-1. A list of big-furniture categories that stand on the floor, marked with count. 
+1. Room size, including width and height in meters.
+2. A list of big-furniture categories that stand on the floor, marked with count. 
 You can refer but not limited to this category list: ['BeverageFridge', 'Dishwasher', 'Microwave', 'Oven', 'Monitor', 'TV', 'BathroomSink', 'StandingSink', 'Bathtub', 'Hardware', 'Toilet', 'AquariumTank', 'DoorCasing', 'GlassPanelDoor', 'LiteDoor', 'LouverDoor', 'PanelDoor', 'NatureShelfTrinkets', 'Pillar', 'CantileverStaircase', 'CurvedStaircase', 'LShapedStaircase', 'SpiralStaircase', 'StraightStaircase', 'UShapedStaircase', 'Pallet', 'Rack', 'CeilingClassicLamp', 'CeilingLight', 'DeskLamp', 'FloorLamp', 'Lamp', 'Bed', 'BedFrame', 'BarChair', 'Chair', 'OfficeChair', 'Mattress', 'Pillow', 'ArmChair', 'Sofa', 'CellShelf', 'TVStand', 'Countertop', 'KitchenCabinet', 'KitchenIsland', 'KitchenSpace', 'LargeShelf', 'SimpleBookcase', 'SidetableDesk', 'SimpleDesk', 'SingleCabinet', 'TriangleShelf', 'BookColumn', 'BookStack', 'Sink', 'Tap', 'Vase', 'TableCocktail', 'CoffeeTable', 'SideTable', 'TableDining', 'TableTop', 'Bottle', 'Bowl', 'Can', 'Chopsticks', 'Cup', 'FoodBag', 'FoodBox', 'Fork', 'Spatula', 'FruitContainer', 'Jar', 'Knife', 'Lid', 'Pan', 'LargePlantContainer', 'PlantContainer', 'Plate', 'Pot', 'Spoon', 'Wineglass', 'Balloon', 'RangeHood', 'Mirror', 'WallArt', 'WallShelf']
 Do not return objects like rug. 
 Do not use quota in name, such as baby's or teacher's.
 Enhance the immersion of the scene by incorporating more categories and increasing their quantities.
 The total count of furniture must be larger than 15.
-2. An object list that stand with back against the wall
-3. Relation between different categories when they have a subordinate relationship and stay very close(less than 5 cm).
+3. An object list that stand with back against the wall
+4. Relation between different categories when they have a subordinate relationship and stay very close(less than 5 cm).
 The former object is smaller than the latter object, such as chair and table, nightstand and bed. 
 
 
@@ -34,6 +35,7 @@ Failure case of relation:
 Here is the example: 
 {
     "Roomtype": "Bedroom",
+    "Size": [3, 4],
     "Category list of big object": {"bed":"1", "wardrobe":"1", "nightstand":"2", "bench":"1"},
     "Object against the wall": ["bed", "wardrobe", "nightstand"],
     "Relation between big objects": [["nightstand", "bed", "side_by_side"], ["bench", "bed", "front_to_front"]]

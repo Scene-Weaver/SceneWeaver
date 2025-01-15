@@ -32,7 +32,8 @@ class BlueprintScorer:
     def __init__(
         self,
         graph,
-        shortest_path_weight=2.0,
+        # shortest_path_weight=2.0,
+        shortest_path_weight=0.0,
         typical_area_weight=10.0,
         typical_area_room_types=TYPICAL_AREA_ROOM_TYPES,
         aspect_ratio_weight=10.0,
@@ -115,9 +116,20 @@ class BlueprintScorer:
             scores["narrow_passage"] = score
         return scores
 
+
     def shortest_path(self, assignment, info):
+        """
+        此代码适用于在图结构中计算多段之间的最短路径，特别是在具有共享边的复杂几何场景中，比如建筑物中的房间和通道布局分析。
+        路径初始化：首先计算质心并初始化每一对段之间的最短路径。
+        最短路径计算：通过共享边，找到从每段到相邻段的最短路径。
+        位移更新：从起点（如楼梯或入口）出发，反复迭代更新其他段到起点的最短路径位移。
+        得分计算：基于位移数据计算一个分数，用于评估路径的优化程度。
+        结果返回：返回所有起点的路径得分总和。
+        """
         shortest_paths = defaultdict(dict)
+        # 计算所有段（segments）的质心坐标，并存入字典 centroids
         centroids = {k: s.centroid.coords[:][0] for k, s in info["segments"].items()}
+        # 遍历共享边（shared_edges），计算各个段之间的最短路径
         for k, ses in info["shared_edges"].items():
             for l, se in ses.items():
                 min_distance = np.full(100, 4)
@@ -128,31 +140,50 @@ class BlueprintScorer:
                         )
                         if np.sum(dist) <= np.sum(min_distance):
                             min_distance = dist
+                # 将 k 到 l 的最小距离存储到 shortest_paths 字典
                 shortest_paths[k][l] = min_distance
+
+        # 获取起点（roots），包括楼梯间和入口
         roots = self.graph[RoomType.Staircase]
         if self.graph.entrance is not None:
             roots.append(self.graph.entrance)
+
+        # 用于存储各个根节点的分数（路径成本）
         scores = {}
+
+        # 遍历每个根节点，计算路径得分
         for root in roots:
+            # 获取分配给当前根节点的对象
             root = assignment[root]
+            # 初始化位移字典，所有点的位移初始化为一个大值（1e3），根节点位移为零
             displacement = {a: np.array([1e3] * 4) for a in assignment}
             displacement[root] = np.zeros(4)
             updated = True
+
+            # 反复迭代更新，直到没有更新为止
             while updated:
                 updated = False
+                # 遍历每个段的邻居
                 for k, ns in info["neighbours"].items():
                     for n in ns:
+                        # 计算从当前点 k 到邻居点 n 的位移距离
                         d = displacement[k] + shortest_paths[k][n]
+                        # 如果新的位移距离比当前记录的更短，则更新
                         if np.sum(d) < np.sum(displacement[n]):
                             displacement[n] = d
                             updated = True
+            # 收集所有非根节点的位移数据
             displacements = np.stack([d for k, d in displacement.items() if k != root])
+            # 将位移数据拆分为 x, xx, y, yy（表示对象边界）
             x, xx, y, yy = displacements.T
+            # 计算得分：基于对象之间的边界关系
             score = (
                 1.0 / ((np.maximum(x, xx) + np.maximum(y, yy)) / displacements.sum(1))
                 - 1
             ) ** 2
+            # 将当前根节点的得分存入 scores 字典
             scores[root] = score.sum()
+        # 返回所有根节点分数的总和
         return sum(s for s in scores.values())
 
     def typical_area(self, assignment, info):

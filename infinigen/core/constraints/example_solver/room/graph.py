@@ -72,6 +72,101 @@ class GraphMaker:
             self.no_hallway_children_prob = no_hallway_children_prob
             self.skewness_min = 0.7
 
+    def make_graph_singleroom(self, i):  # 用于生成房间图的核心方法
+        with FixedSeed(i):
+            for _ in range(self.max_samples):  # 尝试多次生成以满足约束
+                room_type_counts = defaultdict(int)
+                rooms = []
+                children = defaultdict(list)
+                queue = deque()
+
+                def add_room(t, p):
+                    i = len(rooms)  # 新房间的索引
+                    name = f"{t}_{room_type_counts[t]}"  # 命名格式为 "类型_编号"
+                    room_type_counts[t] += 1
+                    if p is not None:
+                        children[p].append(i)  # 将新房间添加到父房间的子房间列表
+                    rooms.append(name)
+                    queue.append(i)  # 将新房间加入队列
+
+                # 添加初始房间（如客厅）
+                add_room(RoomType.NewRoom, None)
+                # while len(queue) > 0:  # 当队列不为空时，不断生成新房间
+                #     i = queue.popleft()  # 从队列取出一个房间
+                #     # 根据房间类型生成子房间
+                #     for rt, spec in self.room_children[get_room_type(rooms[i])].items():
+                #         for _ in range(rg(spec)):
+                #             # 按照配置生成子房间数量
+                #             add_room(rt, i)
+                # 检查是否满足浴室隐私要求
+                if self.requires_bathroom_privacy and not self.has_bathroom_privacy:
+                    continue
+                # 添加环状房间关系
+                for i, r in enumerate(rooms):
+                    for j, s in enumerate(rooms):
+                        if (rt := get_room_type(r)) in self.loop_room_types:
+                            if (rt_ := get_room_type(s)) in self.loop_room_types[rt]:
+                                if (
+                                    uniform() < self.loop_room_types[rt][rt_]
+                                    and j not in children[i]
+                                ):
+                                    children[i].append(j)
+                # 调整走廊和其他房间的关系
+                for i, r in enumerate(rooms):
+                    if get_room_type(r) in self.hallway_room_types:
+                        hallways = [
+                            j
+                            for j in children[i]
+                            if get_room_type(rooms[j]) == RoomType.Hallway
+                        ]
+                        other_rooms = [
+                            j
+                            for j in children[i]
+                            if get_room_type(rooms[j]) != RoomType.Hallway
+                        ]
+                        children[i] = hallways.copy()
+                        for k, o in enumerate(other_rooms):
+                            if (
+                                uniform() < self.no_hallway_children_prob
+                                or len(hallways) == 0
+                            ):
+                                children[i].append(o)
+                            else:
+                                children[
+                                    hallways[np.random.randint(len(hallways))]
+                                ].append(o)
+                # 处理入口和楼梯房间
+                hallways = [
+                    i
+                    for i, r in enumerate(rooms)
+                    if get_room_type(r) == RoomType.Hallway
+                ]
+                if len(hallways) == 0:
+                    entrance = 0  # 如果没有走廊，默认入口为客厅
+                else:
+                    if self.requires_staircase:
+                        prob = np.array(
+                            [self.hallway_prob(len(children[h])) for h in hallways]
+                        )
+                        add_room(
+                            RoomType.Staircase,
+                            np.random.choice(hallways, p=prob / prob.sum()),
+                        )
+                    prob = np.array(
+                        [self.hallway_prob(len(children[h])) for h in hallways]
+                    )
+                    entrance = np.random.choice(hallways, p=prob / prob.sum())
+                    if self.entrance_type == "porch":
+                        add_room(RoomType.Balcony, entrance)
+                        entrance = queue.pop()
+                    elif self.entrance_type == "none":
+                        entrance = None
+                # 创建房间图
+                children_ = [children[i] for i in range(len(rooms))]
+                room_graph = RoomGraph(children_, rooms, entrance)
+                if self.satisfies_constraint(room_graph):  # 检查图是否满足约束
+                    return room_graph
+                
     def make_graph(self, i):  # 用于生成房间图的核心方法
         with FixedSeed(i):
             for _ in range(self.max_samples):  # 尝试多次生成以满足约束

@@ -216,7 +216,7 @@ def home_constraints():
     )
     # endregion
 
-    newroom = rooms[Semantics.Office].excludes(cu.room_types)
+    newroom = rooms[Semantics.NewRoom].excludes(cu.room_types)
     # region classroom
 
     # teacher_desk_obj = wallfurn[shelves.SimpleDeskFactory]
@@ -302,12 +302,12 @@ def home_constraints():
     # endregion
 
     # region living room
-    Sofa_obj = furniture[static_assets.StaticSofaFactory]
-    CoffeeTable_obj = furniture[static_assets.StaticTableFactory]
+    Sofa_obj = furniture[seating.SofaFactory]
+    CoffeeTable_obj = furniture[tables.CoffeeTableFactory]
     TVStand_obj = wallfurn[shelves.TVStandFactory]
-    LargeShelf_obj = wallfurn[static_assets.StaticShelfFactory]
+    LargeShelf_obj = wallfurn[shelves.LargeShelfFactory]
     ArmChair_obj = furniture[seating.ArmChairFactory]
-    SideTable_obj = furniture[static_assets.StaticTableFactory]
+    SideTable_obj = furniture[tables.SideTableFactory]
     plant_obj = obj[tableware.PlantContainerFactory]
     vase_obj = obj[table_decorations.VaseFactory]
     books_obj = obj[table_decorations.BookStackFactory]
@@ -320,35 +320,35 @@ def home_constraints():
         lambda r: (
             Sofa_obj.related_to(r).count().in_range(2, 2)
             * CoffeeTable_obj.related_to(r).count().in_range(1, 1)
-            * CoffeeTable_obj.related_to(Sofa_obj.related_to(r), cu.front_against).count().in_range(1, 1)
-            * TVStand_obj.related_to(r).count().in_range(1, 1)
-            * LargeShelf_obj.related_to(r).count().in_range(1, 1)
-            * LargeShelf_obj.related_to(r).all(
-                lambda s: (
-                    plant_obj.related_to(s, cu.on).count().in_range(1, 1)
-                    * (plant_obj.related_to(s, cu.on).count() >= 0)
-                    * vase_obj.related_to(s, cu.on).count().in_range(1, 1)
-                    * (vase_obj.related_to(s, cu.on).count() >= 0)
-                    * books_obj.related_to(s, cu.on).count().in_range(3, 3)
-                    * (books_obj.related_to(s, cu.on).count() >= 0)
-                )
-            )
-            * ArmChair_obj.related_to(r).count().in_range(2, 2)
-            * SideTable_obj.related_to(r).count().in_range(2, 2)
-            * SideTable_obj.related_to(Sofa_obj.related_to(r), cu.side_by_side).count().in_range(2, 2)
-            * FloorLamp_obj.related_to(r).count().in_range(2, 2)
-            * SideTable_obj.related_to(r).all(
-                lambda s: (
-                    plant_obj.related_to(s, cu.ontop).count().in_range(1, 1)
-                    * (plant_obj.related_to(s, cu.ontop).count() >= 0)
-                )
-            )
-            * CoffeeTable_obj.related_to(r).all(
-                lambda s: (
-                    vase_obj.related_to(s, cu.ontop).count().in_range(1, 1)
-                    * (vase_obj.related_to(s, cu.ontop).count() >= 0)
-                )
-            )
+            # * CoffeeTable_obj.related_to(Sofa_obj.related_to(r), cu.front_against).count().in_range(1, 1)
+            # * TVStand_obj.related_to(r).count().in_range(1, 1)
+            # * LargeShelf_obj.related_to(r).count().in_range(1, 1)
+            # * LargeShelf_obj.related_to(r).all(
+            #     lambda s: (
+            #         plant_obj.related_to(s, cu.on).count().in_range(1, 1)
+            #         * (plant_obj.related_to(s, cu.on).count() >= 0)
+            #         * vase_obj.related_to(s, cu.on).count().in_range(1, 1)
+            #         * (vase_obj.related_to(s, cu.on).count() >= 0)
+            #         * books_obj.related_to(s, cu.on).count().in_range(3, 3)
+            #         * (books_obj.related_to(s, cu.on).count() >= 0)
+            #     )
+            # )
+            # * ArmChair_obj.related_to(r).count().in_range(2, 2)
+            # * SideTable_obj.related_to(r).count().in_range(2, 2)
+            # * SideTable_obj.related_to(Sofa_obj.related_to(r), cu.side_by_side).count().in_range(2, 2)
+            # * FloorLamp_obj.related_to(r).count().in_range(2, 2)
+            # * SideTable_obj.related_to(r).all(
+            #     lambda s: (
+            #         plant_obj.related_to(s, cu.ontop).count().in_range(1, 1)
+            #         * (plant_obj.related_to(s, cu.ontop).count() >= 0)
+            #     )
+            # )
+            # * CoffeeTable_obj.related_to(r).all(
+            #     lambda s: (
+            #         vase_obj.related_to(s, cu.ontop).count().in_range(1, 1)
+            #         * (vase_obj.related_to(s, cu.ontop).count() >= 0)
+            #     )
+            # )
         )
     )
     # endregion

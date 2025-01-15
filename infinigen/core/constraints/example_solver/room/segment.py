@@ -124,6 +124,11 @@ class SegmentMaker:
                         segments[k], segments[i + 1] = s_, t_  # 更新段
                         break  # 成功分割后退出尝试
         return {k: v for k, v in segments.items()}  # 返回所有段
+    
+    def divide_segments_singleroom(self):
+        # 初始化段，包含初始轮廓
+        segments = {0: self.contour}
+        return {k: v for k, v in segments.items()}  # 返回所有段
 
     def merge_segment(self, segments, shared_edges, attached, i, j):
         assert i != j
@@ -151,7 +156,8 @@ class SegmentMaker:
         return shared_edges
 
     def filter_segments(self):
-        segments = self.divide_segments()
+        # segments = self.divide_segments()
+        segments = self.divide_segments_singleroom()
         shared_edges = defaultdict(dict)
         attached = defaultdict(set)
         for k, s in segments.items():

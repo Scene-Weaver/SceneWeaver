@@ -114,6 +114,16 @@ def rotate_object_around_axis(obj, axis, std, angle=None):
 def check_init_valid(
     state: state_def.State, name: str, obj_planes: list, assigned_planes: list, margins
 ):
+    """
+    检查初始对齐是否有效。 return translation
+    参数：
+    - state: 当前场景状态。
+    - name: 对象的名称。
+    - obj_planes: 待对齐的平面列表，每个平面由 (对象名称, 平面索引) 定义。
+    - assigned_planes: 分配的目标平面列表，与 obj_planes 一一对应。
+    - margins: 每个平面对齐时的边距。
+    """
+    # 检查 obj_planes 是否为空或超出限制（最大3个平面）。
     if len(obj_planes) == 0:
         raise ValueError(f"{check_init_valid.__name__} for {name=} got {obj_planes=}")
     if len(obj_planes) > 3:
@@ -171,7 +181,8 @@ def check_init_valid(
 
     dof_remaining = True  # Degree of freedom remaining after the first alignment
 
-    # Check and apply rotations for subsequent planes # 对后续平面进行检查和旋转
+    # Check and apply rotations for subsequent planes 
+    # # 对后续平面进行检查和旋转
     for i in range(1, len(obj_planes)):
         a, b, rotation_axis, rotation_angle, plane_normal_b = get_rot(i)  # z axies
 
@@ -194,13 +205,14 @@ def check_init_valid(
             return False, None, None
 
     # Construct the system of linear equations for translation
+    # 构造线性方程组以计算平移
     A = []
     c = []
     for i in range(len(obj_planes)):
         a_obj_name, a_poly_index = obj_planes[i]
         b_obj_name, b_poly_index = assigned_planes[i]
         margin = margins[i]
-
+        # 获取平面的全局坐标和法向量
         a_obj = bpy.data.objects[a_obj_name]
         b_obj = bpy.data.objects[b_obj_name]
 
@@ -216,16 +228,17 @@ def check_init_valid(
         )
         plane_normal_b = iu.global_polygon_normal(b_obj, b_poly)
         plane_point_b += plane_normal_b * margin
-
+        # 构造线性方程组 Ax = c
         # Append to the matrix A and vector b for Ax = c
         A.append(plane_normal_b)
         c.append(plane_normal_b.dot(plane_point_b - plane_point_a))
 
     # Solve the linear system
+    # 求解线性方程组
     A = np.array(A)
     c = np.array(c)
 
-    t, residuals, rank, s = np.linalg.lstsq(A, c, rcond=None)
+    t, residuals, rank, s = np.linalg.lstsq(A, c, rcond=None) # 最小二乘法求解
     a_obj_name, a_poly_index = obj_planes[0]
 
     a_obj = bpy.data.objects[a_obj_name]
@@ -233,6 +246,7 @@ def check_init_valid(
     # Check if the solution is valid
     # You can define a threshold to determine if the residuals are acceptable
     # Manually compute residuals if m <= n
+    # 检查解是否有效
     if residuals.size == 0:
         computed_residuals = np.dot(A, t) - c
         residuals_sum = np.sum(computed_residuals**2)
@@ -491,13 +505,13 @@ def try_apply_relation_constraints(
     """
 
     validate_relations_feasible(state, name)
-    if (
-        "SimpleDeskFactory(7246963).bbox_placeholder(2397337"
-        in state.objs[name].obj.name
-    ):
-        import pdb
+    # if (
+    #     "SimpleDeskFactory(7246963).bbox_placeholder(2397337"
+    #     in state.objs[name].obj.name
+    # ):
+    #     import pdb
 
-        pdb.set_trace()
+    #     pdb.set_trace()
     for retry in range(n_try_resolve):
         obj_state = state.objs[name]
 
@@ -508,17 +522,8 @@ def try_apply_relation_constraints(
             logger.warning(
                 f"Object {obj_state.obj.name} is too tall for the room: {obj_state.obj.dimensions[2]}, {WALL_HEIGHT=}, {WALL_THICKNESS=}"
             )
-        # 应用关系以对某个对象进行表面采样。
-        # MARK
+        # 应用关系以对某个对象进行表面采样 and move object
         parent_planes = apply_relations_surfacesample(state, name)
-
-        # center = np.array([v.co for v in obj_state.obj.data.vertices]).mean(axis=0)
-        # state.obj_info[name] = {
-        #     "location": obj_state.obj.location,
-        #     "rotation": obj_state.obj.rotation_euler,
-        #     "center": center,
-        #     "size": obj_state.obj.dimensions,
-        # }
 
         # assignments not valid
         if parent_planes is None:
@@ -532,10 +537,6 @@ def try_apply_relation_constraints(
         # faces = [v.vertices for v in obj_state.obj.data.polygons]
         # trimesh_obj = trimesh.Trimesh(vertices=vertices, faces=faces)
         # trimesh_obj.export(f"{name}.obj")
-        if "OfficeChairFactory" in name:
-            # import pdb
-            # pdb.set_trace()
-            a = 1
 
         # invisible_others()
         # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
@@ -543,8 +544,8 @@ def try_apply_relation_constraints(
         if validity.check_post_move_validity(
             state, name, expand_collision=expand_collision
         ):
-            obj_state.dof_matrix_translation = combined_stability_matrix(parent_planes)
-            obj_state.dof_rotation_axis = combine_rotation_constraints(parent_planes)
+            obj_state.dof_matrix_translation = combined_stability_matrix(parent_planes) #平移自由度的合成约束矩阵。
+            obj_state.dof_rotation_axis = combine_rotation_constraints(parent_planes)  #旋转自由度的约束轴或限制信息。
 
             # if "SimpleDeskFactory(7246963).bbox_placeholder(2397337" in state.objs[name].obj.name:
             #     import pdb

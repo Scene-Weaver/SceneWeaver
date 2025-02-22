@@ -23,7 +23,7 @@ from infinigen.core.nodes.node_info import DATATYPE_DIMS, DATATYPE_FIELDS
 
 from . import math as mutil
 from .logging import Suppress
-
+import logging
 logger = logging.getLogger(__name__)
 
 

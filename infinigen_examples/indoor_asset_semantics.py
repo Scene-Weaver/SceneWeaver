@@ -4,6 +4,7 @@
 # Authors: Alexander Raistrick
 import infinigen.assets.objaverse_assets as objaverse_assets
 import infinigen.assets.metascene_assets as metascene_assets
+import infinigen.assets.threedfront_assets as threedfront_assets
 import infinigen.assets.static_assets as static_assets
 from infinigen.assets.objects import (
     appliances,
@@ -195,7 +196,8 @@ def home_asset_usage():
             shelves.TVStandFactory,
             static_assets.StaticSofaFactory,
             objaverse_assets.GeneralObjavFactory,
-            metascene_assets.GeneralMetaFactory
+            metascene_assets.GeneralMetaFactory,
+            threedfront_assets.GeneralThreedFrontFactory
         },
     )
 
@@ -247,7 +249,8 @@ def home_asset_usage():
             elements.RugFactory,
             bathroom.HardwareFactory,
             objaverse_assets.GeneralObjavFactory,
-            metascene_assets.GeneralMetaFactory
+            metascene_assets.GeneralMetaFactory,
+            threedfront_assets.GeneralThreedFrontFactory
         },
     )
 

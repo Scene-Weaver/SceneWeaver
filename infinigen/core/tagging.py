@@ -483,9 +483,12 @@ def tag_support_surfaces(obj, angle_threshold=0.1):
         support_mask = np.zeros(n_poly, dtype=bool)
 
         for poly in mesh_obj.data.polygons:
-            global_normal = butil.global_polygon_normal(mesh_obj, poly)
-            if global_normal.dot(up_vector) > 1 - angle_threshold:
-                support_mask[poly.index] = True
+            try:
+                global_normal = butil.global_polygon_normal(mesh_obj, poly)
+                if global_normal.dot(up_vector) > 1 - angle_threshold:
+                    support_mask[poly.index] = True
+            except:
+                continue
 
         if t.Subpart.SupportSurface.value not in tag_system.tag_dict:
             tag_system.tag_dict[t.Subpart.SupportSurface.value] = (

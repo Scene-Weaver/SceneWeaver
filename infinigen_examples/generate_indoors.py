@@ -199,7 +199,7 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
             stages["on_floor"], state, all_vars, limits, nonempty=True
         )
         for i, vars in enumerate(assignments):
-            solver.init_graph_metascene(
+            solver.init_graph_physcene(
                 # stages["on_floor"],
                 var_assignments=vars,
                 stage=this_stage,
@@ -228,7 +228,7 @@ def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
             # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
         return solver.state
 
-    # state = p.run_stage("solve_large", solve_large, use_chance=False, default=state)
+    state = p.run_stage("solve_large", solve_large, use_chance=False, default=state)
 
     solved_rooms = [
         state.objs[assignment[cu.variable_room]].obj

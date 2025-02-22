@@ -25,9 +25,11 @@ from infinigen.core.constraints.example_solver.geometry import (
 from infinigen.core.constraints.example_solver.state_def import ObjectState, State
 from infinigen.core.placement.factory import AssetFactory
 from infinigen.core.util import blender as butil
+from infinigen_examples.util.visible import invisible_others, visible_others
 
 from . import moves
 from .reassignment import pose_backup, restore_pose_backup
+import os
 
 # from line_profiler import LineProfiler
 
@@ -184,15 +186,27 @@ class Addition(moves.Move):
         name = self._new_obj.name
 
         if gen_class.__name__ == "MetaCategoryFactory":
+            rotation = gen.rotation_orig
             position = gen.location_orig
-            import os
             room_width = os.getenv("room_width")
             room_height = os.getenv("room_height")
             position[0] += int(room_width)/2
             position[1] += int(room_height)/2
 
+        # if gen_class.__name__ == "ThreedFrontCategoryFactory":
+        #     rotation = gen.rotation_orig
+        #     position = gen.location_orig
+            
+
+        # invisible_others()
+        # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+        # visible_others()
+        
+                
+
         iu.translate(state.trimesh_scene, name, position)
         iu.rotate(state.trimesh_scene, name, np.array([0, 0, 1]), rotation)
+
 
         success = dof.try_apply_relation_constraints(
             state,

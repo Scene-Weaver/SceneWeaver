@@ -33,6 +33,7 @@ from infinigen.core.tags import Semantics, Subpart
 from infinigen.assets.objaverse_assets import GeneralObjavFactory
 
 from infinigen.assets.metascene_assets import GeneralMetaFactory
+from infinigen.assets.threedfront_assets import GeneralThreedFrontFactory
 from infinigen.assets.objects import (
             appliances,
             bathroom,
@@ -434,16 +435,25 @@ class Solver:
         var_assignments: dict[str, str],
         stage = "large" #large, medium, small
     ):  
-        basedir = "/mnt/fillipo/huangyue/recon_sim/7_anno_v4/export_stage1/scene0019_00/"
-        metadata = f"{basedir}/metadata.json"
+        basedir = "/mnt/fillipo/huangyue/recon_sim/7_anno_v4/export_stage2_sm/scene0001_00/"
+        
+        metadata = "/mnt/fillipo/yandan/metascene/export_stage2_sm/scene0001_00/metadata.json"
         import json
         with open(metadata,"r") as f:
             Placement = json.load(f)
         for key,value in Placement.items():
-            if value in ["wall","ceiling","floor"]:
+            category = value["category"]
+            if category in ["wall","ceiling","floor"]:
                 continue
-            
+            # if category == "floor":
+            #     bpy.ops.import_scene.gltf(filepath=f"{basedir}/{key}.glb")
+            #     imported_obj = bpy.context.selected_objects[0]
+            #     bbox_local = imported_obj.bound_box
+            #     import mathutils
+            #     # Convert the bounding box corners to world space by applying the object's transformation
+            #     bbox_world = [imported_obj.matrix_world @ mathutils.Vector(corner) for corner in bbox_local]
 
+            
             position = [0,0,0]
 
             rotation = 0
@@ -477,19 +487,21 @@ class Solver:
             #     against_wall = True if key in self.category_against_wall else False
             #     on_floor = True
             
-            filter_domain = self.calc_filter_domain(value, num=None, on_floor=on_floor, against_wall=against_wall)
+            filter_domain = self.calc_filter_domain(category, num=None, on_floor=on_floor, against_wall=against_wall)
 
-            if module_and_class=="MetaScene":
-                gen_class = copy.deepcopy(GeneralMetaFactory)
-                size = None
-                # x_dim, y_dim, z_dim = size
-                category = value
-                # gen_class.x_dim = x_dim
-                # gen_class.y_dim = y_dim
-                # gen_class.z_dim = z_dim
-                gen_class._category = category
-                gen_class._asset_file = f"{basedir}/{key}.glb"
-                class_name = category
+           
+            gen_class = copy.deepcopy(GeneralMetaFactory)
+            size = None
+            # x_dim, y_dim, z_dim = size
+            
+            # gen_class.x_dim = x_dim
+            # gen_class.y_dim = y_dim
+            # gen_class.z_dim = z_dim
+            gen_class._category = category
+            gen_class._asset_file = f"{basedir}/{key}.glb"
+            front_view_angle = value["front_view"].split("/")[-1].split(".")[0].split("_")[-1]
+            gen_class._front_view_angle = int(front_view_angle)
+            class_name = category
             
             search_rels = filter_domain.relations
             # 筛选出有效的关系，只选择非否定关系
@@ -523,6 +535,85 @@ class Solver:
             # invisible_others()
             # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
             # visible_others()
+                
+        return self.state
+    
+    @gin.configurable
+    def init_graph_physcene(
+        self,
+        # filter_domain: r.Domain,
+        var_assignments: dict[str, str],
+        stage = "large" #large, medium, small
+    ):  
+        basedir = "/home/yandan/workspace/PhyScene/3D_front/generate_filterGPN_clean"
+        
+        metadata = f"{basedir}/LivingDiningRoom-2954_livingroom.json"
+        import json
+        with open(metadata,"r") as f:
+            Placement = json.load(f)
+        for objname, obj_lst in Placement["ThreedFront"].items():
+            for obj_info in obj_lst:
+            
+                category = obj_info["label"]
+                if "lamp" in category:
+                    continue
+
+                position = obj_info["position"]
+                position = [position[0],position[2],position[1]]
+                radians = math.radians(90)
+                rotation = radians-obj_info["theta"]
+                scale = obj_info["scale"]
+
+                name = category
+                module_and_class = "ThreeDFuture"
+                parent_obj_name = None
+                against_wall = False
+                on_floor = True
+
+            
+                filter_domain = self.calc_filter_domain(category, num=None, on_floor=on_floor, against_wall=against_wall)
+
+            
+                gen_class = copy.deepcopy(GeneralThreedFrontFactory)
+                gen_class._category = category
+                gen_class._asset_file = obj_info["path"]
+                gen_class._scale = scale
+                gen_class._rotation = rotation
+                gen_class._position = position
+                class_name = category
+                
+                search_rels = filter_domain.relations
+                # 筛选出有效的关系，只选择非否定关系
+                search_rels = [
+                    rd for rd in search_rels if not isinstance(rd[0], cl.NegatedRelation)
+                ]
+
+                assign = propose_relations.find_given_assignments(self.state, search_rels, parent_obj_name=parent_obj_name)
+                for i, assignments in enumerate(assign):
+                    found_tags = usage_lookup.usages_of_factory( gen_class )  
+                    move = moves.Addition(
+                        names=[
+                            f"{np.random.randint(1e6):04d}_{gen_class.__name__}"
+                        ],  # decided later # 随机生成一个名称，基于生成器类的名称
+                        gen_class=gen_class,  # 使用传入的生成器类
+                        relation_assignments=assignments,  # 传入分配的关系
+                        temp_force_tags=found_tags,  # 临时强制标签
+                    )
+                    
+                    target_name = f"{np.random.randint(1e7)}_{class_name}"
+                    # target_name = np.random.randint(1e7)+"_SofaFactory"
+                    
+                    asset_file = obj_info["path"]
+
+                    move.apply_init(
+                        self.state, target_name, None, position, rotation, gen_class, asset_file
+                    )
+
+                    # Placement[key][num]["name"] = target_name
+                    break
+                # invisible_others()
+                # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+                # visible_others()
                 
         return self.state
     

@@ -1,0 +1,744 @@
+{
+    "roomtype": "Classroom",
+    "roomsize": [
+        10,
+        12
+    ],
+    "big_category_dict": {
+        "Desk": "12",
+        "Chair": "24",
+        "TeacherDesk": "1",
+        "OfficeChair": "1",
+        "Bookshelf": "2",
+        "LargeShelf": "1",
+        "Cabinet": "1"
+    },
+    "category_against_wall": [
+        "Blackboard",
+        "Bookshelf",
+        "LargeShelf",
+        "Cabinet"
+    ],
+    "relation_big_object": [
+        [
+            "Chair",
+            "Desk",
+            "front_against"
+        ],
+        [
+            "OfficeChair",
+            "TeacherDesk",
+            "front_against"
+        ]
+    ],
+    "small_category_list": [
+        "notebook",
+        "pen",
+        "book",
+        "laptop",
+        "plant",
+        "paper",
+        "stationery",
+        "teaching aids",
+        "clock"
+    ],
+    "relation_small_object": [
+        [
+            "book",
+            "Bookshelf",
+            "on",
+            "30"
+        ],
+        [
+            "laptop",
+            "TeacherDesk",
+            "ontop",
+            "1"
+        ],
+        [
+            "plant",
+            "TeacherDesk",
+            "ontop",
+            "1"
+        ]
+    ],
+    "name_mapping": {
+        "Desk": "shelves.SimpleDeskFactory",
+        "Chair": "seating.ChairFactory",
+        "TeacherDesk": "shelves.SimpleDeskFactory",
+        "OfficeChair": "seating.OfficeChairFactory",
+        "Blackboard": null,
+        "Bookshelf": "shelves.SimpleBookcaseFactory",
+        "LargeShelf": "shelves.LargeShelfFactory",
+        "Cabinet": "shelves.SingleCabinetFactory",
+        "notebook": null,
+        "pen": null,
+        "book": "table_decorations.BookStackFactory",
+        "laptop": "appliances.MonitorFactory",
+        "plant": "tableware.PlantContainerFactory",
+        "paper": null,
+        "stationery": null,
+        "teaching aids": null,
+        "clock": null
+    },
+    "gpt_text_response": "constraints[\"classroom\"] = newroom.all(\n    lambda r: (\n        Desk_obj.related_to(r).count().in_range(12, 12)\n        * Chair_obj.related_to(r).count().in_range(24, 24)\n        * TeacherDesk_obj.related_to(r).count().in_range(1, 1)\n        * OfficeChair_obj.related_to(r).count().in_range(1, 1)\n        * Bookshelf_obj.related_to(r).count().in_range(2, 2)\n        * LargeShelf_obj.related_to(r).count().in_range(1, 1)\n        * Cabinet_obj.related_to(r).count().in_range(1, 1)\n        * Bookshelf_obj.related_to(r).all(\n            lambda s: (\n                book_obj.related_to(s, cu.on).count().in_range(30, 30)\n                * (book_obj.related_to(s, cu.on).count() >= 0)\n            )\n        )\n        * TeacherDesk_obj.related_to(r).all(\n            lambda s: (\n                laptop_obj.related_to(s, cu.ontop).count().in_range(1, 1)\n                * (laptop_obj.related_to(s, cu.ontop).count() >= 0)\n                * plant_obj.related_to(s, cu.ontop).count().in_range(1, 1)\n                * (plant_obj.related_to(s, cu.ontop).count() >= 0)\n            )\n        )\n    )\n)",
+    "Placement": {
+        "Desk": {
+            "1": {
+                "position": [
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "2": {
+                "position": [
+                    1,
+                    3
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "3": {
+                "position": [
+                    1,
+                    5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "4": {
+                "position": [
+                    1,
+                    7
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "5": {
+                "position": [
+                    1,
+                    9
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "6": {
+                "position": [
+                    3,
+                    1
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "7": {
+                "position": [
+                    3,
+                    3
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "8": {
+                "position": [
+                    3,
+                    5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "9": {
+                "position": [
+                    3,
+                    7
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "10": {
+                "position": [
+                    3,
+                    9
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "11": {
+                "position": [
+                    5,
+                    1
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            },
+            "12": {
+                "position": [
+                    5,
+                    3
+                ],
+                "rotation": 0,
+                "size": [
+                    0.6,
+                    1.2,
+                    0.75
+                ]
+            }
+        },
+        "Chair": {
+            "1": {
+                "position": [
+                    1,
+                    0.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "1",
+                    "front_against"
+                ]
+            },
+            "2": {
+                "position": [
+                    1,
+                    2.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "2",
+                    "front_against"
+                ]
+            },
+            "3": {
+                "position": [
+                    1,
+                    4.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "3",
+                    "front_against"
+                ]
+            },
+            "4": {
+                "position": [
+                    1,
+                    6.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "4",
+                    "front_against"
+                ]
+            },
+            "5": {
+                "position": [
+                    1,
+                    8.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "5",
+                    "front_against"
+                ]
+            },
+            "6": {
+                "position": [
+                    3,
+                    0.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "6",
+                    "front_against"
+                ]
+            },
+            "7": {
+                "position": [
+                    3,
+                    2.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "7",
+                    "front_against"
+                ]
+            },
+            "8": {
+                "position": [
+                    3,
+                    4.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "8",
+                    "front_against"
+                ]
+            },
+            "9": {
+                "position": [
+                    3,
+                    6.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "9",
+                    "front_against"
+                ]
+            },
+            "10": {
+                "position": [
+                    3,
+                    8.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "10",
+                    "front_against"
+                ]
+            },
+            "11": {
+                "position": [
+                    5,
+                    0.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "11",
+                    "front_against"
+                ]
+            },
+            "12": {
+                "position": [
+                    5,
+                    2.5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "12",
+                    "front_against"
+                ]
+            },
+            "13": {
+                "position": [
+                    1,
+                    1.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "1",
+                    "front_against"
+                ]
+            },
+            "14": {
+                "position": [
+                    1,
+                    3.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "2",
+                    "front_against"
+                ]
+            },
+            "15": {
+                "position": [
+                    1,
+                    5.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "3",
+                    "front_against"
+                ]
+            },
+            "16": {
+                "position": [
+                    1,
+                    7.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "4",
+                    "front_against"
+                ]
+            },
+            "17": {
+                "position": [
+                    1,
+                    9.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "5",
+                    "front_against"
+                ]
+            },
+            "18": {
+                "position": [
+                    3,
+                    1.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "6",
+                    "front_against"
+                ]
+            },
+            "19": {
+                "position": [
+                    3,
+                    3.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "7",
+                    "front_against"
+                ]
+            },
+            "20": {
+                "position": [
+                    3,
+                    5.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "8",
+                    "front_against"
+                ]
+            },
+            "21": {
+                "position": [
+                    3,
+                    7.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "9",
+                    "front_against"
+                ]
+            },
+            "22": {
+                "position": [
+                    3,
+                    9.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "10",
+                    "front_against"
+                ]
+            },
+            "23": {
+                "position": [
+                    5,
+                    1.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "11",
+                    "front_against"
+                ]
+            },
+            "24": {
+                "position": [
+                    5,
+                    3.5
+                ],
+                "rotation": 180,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "Desk",
+                    "12",
+                    "front_against"
+                ]
+            }
+        },
+        "TeacherDesk": {
+            "1": {
+                "position": [
+                    7,
+                    6
+                ],
+                "rotation": 0,
+                "size": [
+                    0.8,
+                    1.5,
+                    0.75
+                ]
+            }
+        },
+        "OfficeChair": {
+            "1": {
+                "position": [
+                    7,
+                    5
+                ],
+                "rotation": 0,
+                "size": [
+                    0.5,
+                    0.5,
+                    0.9
+                ],
+                "parent": [
+                    "TeacherDesk",
+                    "1",
+                    "front_against"
+                ]
+            }
+        },
+        "Blackboard": {
+            "1": {
+                "position": [
+                    0.25,
+                    6
+                ],
+                "rotation": 90,
+                "size": [
+                    0.05,
+                    10,
+                    2
+                ]
+            }
+        },
+        "Bookshelf": {
+            "1": {
+                "position": [
+                    9.75,
+                    2
+                ],
+                "rotation": 270,
+                "size": [
+                    0.4,
+                    2,
+                    2
+                ]
+            },
+            "2": {
+                "position": [
+                    9.75,
+                    10
+                ],
+                "rotation": 270,
+                "size": [
+                    0.4,
+                    2,
+                    2
+                ]
+            }
+        },
+        "LargeShelf": {
+            "1": {
+                "position": [
+                    9.75,
+                    6
+                ],
+                "rotation": 270,
+                "size": [
+                    0.5,
+                    4,
+                    2
+                ]
+            }
+        },
+        "Cabinet": {
+            "1": {
+                "position": [
+                    9.75,
+                    4
+                ],
+                "rotation": 270,
+                "size": [
+                    0.5,
+                    1,
+                    1
+                ]
+            }
+        }
+    }
+}

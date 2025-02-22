@@ -7,7 +7,7 @@ You will receive:
 1. The roomtype you need to design.
 
 You need to return a dict including:
-1. Room size, including width and height in meters. Make the room a little bit bigger than the regular size.
+1. Room size, including length and width in meters. Make the room a little bit bigger than the regular size.
 2. A list of large-furniture categories that stand on the floor, marked with count. 
 You can refer but not limited to this category list: ['BeverageFridge', 'Dishwasher', 'Microwave', 'Oven', 'Monitor', 'TV', 'BathroomSink', 'StandingSink', 'Bathtub', 'Hardware', 'Toilet', 'AquariumTank', 'DoorCasing', 'GlassPanelDoor', 'LiteDoor', 'LouverDoor', 'PanelDoor', 'NatureShelfTrinkets', 'Pillar', 'CantileverStaircase', 'CurvedStaircase', 'LShapedStaircase', 'SpiralStaircase', 'StraightStaircase', 'UShapedStaircase', 'Pallet', 'Rack', 'CeilingClassicLamp', 'CeilingLight', 'DeskLamp', 'FloorLamp', 'Lamp', 'Bed', 'BedFrame', 'BarChair', 'Chair', 'OfficeChair', 'Mattress', 'Pillow', 'ArmChair', 'Sofa', 'CellShelf', 'TVStand', 'Countertop', 'KitchenCabinet', 'KitchenIsland', 'KitchenSpace', 'LargeShelf', 'SimpleBookcase', 'SidetableDesk', 'SimpleDesk', 'SingleCabinet', 'TriangleShelf', 'BookColumn', 'BookStack', 'Sink', 'Tap', 'Vase', 'TableCocktail', 'CoffeeTable', 'SideTable', 'TableDining', 'TableTop', 'Bottle', 'Bowl', 'Can', 'Chopsticks', 'Cup', 'FoodBag', 'FoodBox', 'Fork', 'Spatula', 'FruitContainer', 'Jar', 'Knife', 'Lid', 'Pan', 'LargePlantContainer', 'PlantContainer', 'Plate', 'Pot', 'Spoon', 'Wineglass', 'Balloon', 'RangeHood', 'Mirror', 'WallArt', 'WallShelf']
 Do not return objects like rug. 
@@ -253,7 +253,7 @@ wallfurn = furniture.related_to(rooms, cu.against_wall)
 """
 
 
-#### 5.generate position & size
+#### 5.generate position & size for large object
 
 step_5_position_prompt_system = """
 You are an experienced layout designer to design a 3D scene. 
@@ -268,7 +268,7 @@ A 90-degree Z rotation means that the object will face the positive Y axis. The 
 
 You will receive:
 1. The roomtype you need to design.
-2. The room size in width and height.
+2. The room size in length and width.
 3. Furnitures that exist in this room with counts.
 4. A list of furnitures that stand with back against the wall
 5. Relation between different furniture categories. 
@@ -301,5 +301,68 @@ Here is the given room info:
 "Object against the wall": {category_against_wall}
 "Relation between big objects": {relation_big_object}
 
-Here is your response of "Placement" (must return a complete dictionary):
+Here is your response of "Placement" (must return a complete dictionary with the key "Placement"):
+"""
+
+
+#### 6.generate position & size for small object
+
+step_6_small_position_prompt_system = """
+You are an experienced layout designer to design a 3D scene. 
+Your goal is to help me place 3D objects into the scene.
+
+**3D Convention:**
+- Right-handed coordinate system.
+- The X-Y plane is the floor; the Z axis points up. The origin is at a corner, defining the global frame.
+- Asset front faces point along the positive X axis. The Z axis points up. The local origin is centered in X-Y and at the bottom in Z. 
+A 90-degree Z rotation means that the object will face the positive Y axis. The bounding box aligns with the assets local frame.
+
+
+You will receive:
+1. The roomtype you need to design.
+2. The room size in length and width.
+3. Big Furnitures that exist in this room with counts.
+4. A list of small-furniture categories that belongs to (on or inside) the big furniture
+5. Relation between small furniture and big furniture, with count for each big furniture.
+6. The placement of big furniture including:  X-Y Position, Z rotation, and size (x_dim, y_dim, z_dim). 
+
+
+You need to return the placement of small furnigure as a dict including:
+1. X-Y-Z Position and Z rotation of each small furniture. Make the layout more sparse without collision.
+2. The initial size of small furniture in (x_dim, y_dim, z_dim) when they face to the positive X axis, which means (depth, width, height). 
+3. Related big object that each small object belongs to or has relation with.
+
+Here is the example: 
+{
+    "Roomtype": "Bedroom",
+    "Roomsize": [3, 4],
+    "List of big object": {"bed":"1", "wardrobe":"1", "nightstand":"2", "bench":"1"},
+    "List of small furniture": ["book", "plant", "lamp", "clothes"],
+    "Relation between small and big furniture": ["book", "nightstand", "on", "1"], ["plant", "nightstand", "ontop", "1"], ["lamp", "nightstand", "ontop", "1"], ["clothes", "bench", "ontop", "1"], ["clothes", "wardrobe", "on", "2"]
+    "Placement of big furniture": {
+        "bed": {"1": {"position": [1,1.5], "rotation": 0, "size": [2,2,0.6]}}, 
+        "wardrobe": {"1": {"position": [1,3.5], "rotation": 270, "size": [0.5,2,2]}}, 
+        "nightstand": {"1": {"position": [0.25,0.25], "size": [0.5,0.5,0.6], "rotation": 0, "parent":["bed","1", "side_by_side"]}, "2": {"position": [0.25,2.75], "rotation": 0, "size": [0.5,0.5,0.6], "parent":["bed","1","side_by_side"]}}, 
+        "bench": {"1": {"position": [2.25,1.5], "rotation": 180, "size": [0.5,2,0.5], "parent":["bed","1","front_to_front"]}}
+    }
+    "Placement of small furniture": {
+        "book": {"1": {"position": [0.2,0.1, 0.4], "size": [0.15,0.2,0.04], "rotation": 90, "parent":["nightstand","1", "on"]}, "2": {"position": [0.2,2.7,0.2], "size": [0.12,0.18,0.03], "rotation": 0, "parent":["nightstand",2", "on"]}},
+        "plant": {"1": {"position": [0.35,0.1,0.6], "size": [0.2,0.2,0.3], "rotation": 0, "parent":["nightstand","1", "ontop"]}, "2": {"position": [0.25,2.85,0.6], "size": [0.15,0.15,0.2], "rotation": 0, "parent":["nightstand",2", "ontop"]}},
+        "lamp": {"1": {"position": [0.25,0.35,0.6], "size": [0.15,0.15,0.45], "rotation": 0, "parent":["nightstand","1", "ontop"]}, "2": {"position": [0.4,2.9,0.6], "size": [0.15,0.15,0.45], "rotation": 0, "parent":["nightstand",2", "ontop"]}}
+        "clothes": {"1": {"position": [2.25,1.4,0.5], "size": [0.4,0.5,0.1], "rotation": 180, "parent":["bench","1", "ontop"]}, "2": {"position": [0.5,2.85,1], "size": [0.1,0.5,1], "rotation": 0, "parent":["wardrobe","1", "on"]}, "3": {"position": [1.5,2.85,1], "size": [0.1,0.45,1], "rotation": 0, "parent":["wardrobe","1", "on"]}}
+    }
+}
+
+"""
+
+step_6_small_position_prompt_user = """
+Here is the given room info:
+"Roomtype": {roomtype}
+"Roomsize": {roomsize}
+"List of big object": {big_category_dict}
+"List of small furniture": {small_category_lst}
+"Relation between small and big furniture": {relation_small_big}
+"Placement of big furniture": {placement_big}
+
+Here is your response of "Placement of small furniture" (must return a complete dictionary with the key "Placement of small furniture"):
 """

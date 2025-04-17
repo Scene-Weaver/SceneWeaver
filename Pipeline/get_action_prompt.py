@@ -3,13 +3,16 @@
 system_prompt = """
 You are an expert in 3D scene generation and optimization. Your task is to iteratively design a scene to make it as realistic, accurate, and controllable as possible.
 
-Given the user's prompt, carefully analyze the scene and choose the most effective method from a set of available options to improve it. Your goal is to select the method that will provide the most significant enhancement based on the current scene’s data, available resources, and constraints.
+Given the user's prompt, carefully analyze the scene and choose the most effective method from a set of available options to improve it. 
+Your goal is to select the method that will provide the most significant enhancement based on the current scene’s data, available resources, and constraints.
+You **must not** pay attention to the style and texture.
 """
 
 
 methods_prompt = """
 Available Methods for 3D Scene Design/Modification:
 We have four methods to design or modify a 3D scene, each with different strengths and weaknesses. The goal is to select the most effective method for the current iteration based on the user's prompt and the existing scene data.
+None of the methods can modify or control the style. Obmit the requirement of style and texture. Focus on the semantic and layout.
 
 Method 1: Load real2sim indoor scene data
   Data Prior: Yes
@@ -39,7 +42,7 @@ Method 4: Generate/implement scene with GPT
   Use Case 2: Add large objects in the current scene.
   Use Case 3: Add small objects in/on the large furniture, especially when method 3 does not work. (e.g., add a cup on the table or a book in the shelf).
   Strengths: Highly versatile and capable of generating scenes for any room type. Flexible with respect to room design and customization. Also expert in adding a single object 
-  Weaknesses: May not be as real or accurate as data-driven methods. Can not add objects on the wall, ground, or ceiling. 
+  Weaknesses: May not be as real or accurate as data-driven methods. Can not modify objects in the current scene. Can not add objects on the wall, ground, or ceiling. 
 
 Method 5: Modify layout with GPT
   Data Prior: LLM prior
@@ -137,6 +140,8 @@ Current Iteration: {iter}
 
 Previous method, ideas and evaluated score:
 {previous_guide}
+If you've tried the same method several times and it's still not working, it's a sign that this approach isn't suitable for solving the problem. 
+It's time to try shift your attention to another issue.
 
 Current Scene:
 {sceneinfo_prompt}
@@ -153,7 +158,7 @@ User Prompt Satisfaction: Does the current scene meet the user's prompt requirem
 Realism Enhancement: What adjustments can be made to make the scene feel more realistic? Consider adding, removing, or repositioning objects to enhance visual harmony and authenticity.
 Check Object: Check for any redundant or unnecessary objects that could be removed to streamline the scene.
 
-Note: Do not add rugs on the ground or decorations on the wall. 
+Note: Do not add rugs on the ground or decorations on the wall. You **must not** pay attention to the style and texture.
 You should use "remove" and "add" in two iterations rather than "replace" in one iteration, since it contains two steps.
 Make your choice based on which method will achieve the highest quality and efficiency in improving the scene while keeping the user's needs and constraints in mind.
 

@@ -148,6 +148,7 @@ class State:
             )
 
     def __post_init__(self):
+        
         bpy_objs = [o.obj for o in self.objs.values() if o.obj is not None]
 
         self.trimesh_scene = parse_scene.parse_scene(bpy_objs)

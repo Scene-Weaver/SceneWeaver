@@ -67,10 +67,11 @@ class TranslateMove(moves.Move):
     def apply_gradient(self, state: State, temperature=None, expand_collision=False):
         (target_name,) = self.names
 
+        # state.trimesh_scene.show()
         os = state.objs[target_name]
 
         obj_state = state.objs[target_name]
-        # print(target_name, "1 ",obj_state.obj.location)
+        # print(target_name,s "1 ",obj_state.obj.location)
 
         parent_planes = apply_relations_surfacesample(
             state, target_name, use_initial=True,closest_surface=True

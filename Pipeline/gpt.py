@@ -12,18 +12,20 @@ class GPT4(GPT4o):
         "4o": "gpt-4o-2024-08-06",
         "4o-mini": "gpt-4o-mini",
         "gpt-4-turbo": "gpt-4-turbo-2024-04-09",
+        "4.5":'gpt-4.5-preview-2025-02-27'
     }
 
     def __init__(
         self,
         api_key=None,
         version="gpt-4-turbo",
+        region="southcentralus"
     ):
         # def __init__(self, '
         self.version = version
         MODEL = self.VERSIONS[version]
         self.MODEL = MODEL
-        REGION = "southcentralus"
+        REGION = region
         super().__init__(MODEL, REGION)
 
     def __call__(self, payload, verbose=False):
@@ -86,18 +88,17 @@ class GPT4(GPT4o):
         }
         return object_caption_payload
     
-    def get_payload_eval(self, prompting_text_user,render_path):
+    def get_payload_eval(self, prompting_text_user,render_path=None):
         if render_path is not None:
             imgs_base64 = self.encode_image(render_path) 
             img_dict = {
                 "type": "image_url",
                 "image_url": {
-                    "url": f"data:image/png;base64,{imgs_base64}"
+                    "url": f"data:image/jpeg;base64,{imgs_base64}"
                 }
             }
 
-            prompting_user_lst = prompting_text_user.split("SCENE_IMAGE")
-            content_user = [{"type": "text", "text": prompting_user_lst[0]},
+            content_user = [{"type": "text", "text": prompting_text_user},
                             img_dict]
         else:
             content_user = [{"type": "text", "text": prompting_text_user}]

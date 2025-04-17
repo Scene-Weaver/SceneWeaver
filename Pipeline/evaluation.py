@@ -30,8 +30,8 @@ def eval_scene(iter,user_demand):
 
 
 def eval_general_score(iter,user_demand):
-    # basedir = "/home/yandan/workspace/infinigen/record_scene"
-    basedir = "/mnt/fillipo/yandan/scenesage/record_scene/bedroom/record_scene"
+    basedir = "/home/yandan/workspace/infinigen/record_scene"
+    # basedir = "/mnt/fillipo/yandan/scenesage/record_scene/bedroom/record_scene"
     image_path_1 = f"{basedir}/render_{iter}.jpg"
     with open(f"{basedir}/layout_{iter}.json", "r") as f:
         layout = json.load(f)
@@ -62,7 +62,7 @@ def eval_general_score(iter,user_demand):
     """
 
     prompting_text_user = f"""
-You are given a top-down room render image and the corresponding layout. 
+You are given a top-down room render image and the corresponding layout of each object. 
 Your task is to evaluate how well they align with the user’s preferences (provided in triple backticks) across the four criteria listed below.
 For each criterion, assign a score from 0 to 10, and provide a brief justification for your rating. 
 
@@ -71,41 +71,46 @@ Score of 10: Fully meets or exceeds expectations for this aspect; no major impro
 Score of 0: Completely fails to meet expectations; this aspect is either absent or directly contradicts the preferences.
     
 Evaluation Criteria:
-1. Realism: How realistic the room appears according to the user's prefernce. Do not pay attension to the texture, lighting, and door.
-    Good: Room has real layout. Multiple daily objects contribute to a lived-in, believable feel.
-    Bad: Room has strange objects and layout, which is far from a real room.
+1. Realism: How realistic the room appears according to the user's prefernce. Do not pay attention to the texture, lighting, and door.
+    Positive: Room has real layout. Multiple daily objects contribute to a lived-in, believable feel.
+    Negative: Room has strange objects and layout, which is far from a real room.
 2. Functionality: How well the room supports the activities specified in the user’s preferences (e.g., sleeping, working, relaxing, watching TV).
-    Good: The room is designed for function of user's preference. Objects in the room is designed for the related activity.
-    Bad: The room does not satisfy the function and activity. The room type mismatch the requirement. In lack of the key object.
+    Positive: The room is designed for function of user's preference. Objects in the room is designed for the related activity.
+    Negative: The room does not satisfy the function and activity. The room type mismatch the requirement. In lack of the key object.
 3. Layout: How logically and efficiently the furniture is arranged, and whether the layout matches user preferences for spacing, orientation, or relations between objects.
-    Good: Objects are well placed. Room is clean and tidy. Relation between objects are reasonable, such as chair face to the desk. Layout matches the user's preference.
-    Bad: Room is messy. Objects are placed in wrong places or placed randomly. Floating objects. Some large objects do not stand close to the wall when they are supposed to, such as large shelf and sofa.
-4. Completion: How complete the room feels, considering both large furniture and smaller objects like decor, accessories, and everyday items.
-    Good: Do not need more objects. A complete room correspond to user's preference.
-    Bad: Room is empty. Too many blank areas. Seems unfinished.
+    Positive: Objects are well placed. Room is clean and tidy. Relation between objects are reasonable, such as chair face to the desk. Layout matches the user's preference.
+    Negative: Room is messy. Objects are placed in wrong places or placed randomly. Floating objects. Some large objects do not stand close to the wall when they are supposed to, such as large shelf and sofa.
+4. Completion: How complete the room is, considering both large furniture and smaller objects like decor, accessories, and everyday items. 
+    Positive: Do not need more objects. A complete room correspond to user's preference.
+    Negative: Room is empty. Too many blank areas. Seems unfinished.
 
 Use the following user preferences as reference (enclosed in triple backticks):
 User Preference:
 ```{user_demand}```
 
 Room layout:
-```{layout}```
-The Layout include each object's X-Y-Z Position, Z rotation, size (x_dim, y_dim, z_dim), as well as relation info with parents.
+{layout}
 
+The Layout include each object's X-Y-Z Position, Z rotation, size (x_dim, y_dim, z_dim), as well as relation info with parents.
+Each key in layout is the name for each object, consisting of a random number and the category name, such as "3142143_table". 
+Note different category name can represent the same category, such as ChairFactory, armchair and chair can represent chair simultaneously.
+Count objects carefully! Do not miss any details.
+
+Return the results in the following JSON format:
+{example_json}
+
+For the image:
+Each object is marked with a 3D bounding box and its category label. You must count the object carefully with the given image and layout.
 **3D Convention:**
 - Right-handed coordinate system.
 - The X-Y plane is the floor; the Z axis points up. The origin is at a corner (the left-top corner of the rendered image), defining the global frame.
 - Asset front faces point along the positive X axis. The Z axis points up. The local origin is centered in X-Y and at the bottom in Z. 
 A 90-degree Z rotation means that the object will face the positive Y axis. The bounding box aligns with the assets local frame.
 
-Return the results in the following JSON format:
-```json
-{example_json}
-```
     """
 
-    prompt_payload = gpt.get_payload_eval(prompting_text_user=prompting_text_user,render_path=image_path_1)
-    
+
+    prompt_payload = gpt.get_payload_eval(prompting_text_user=prompting_text_user)
 
     grades = {
         "realism": [],
@@ -143,31 +148,32 @@ Return the results in the following JSON format:
     return grades,grading
 
 if __name__ == "__main__":
-    grades = {
-        "realism": {"mean":[],"std":[]},
-        "functionality":  {"mean":[],"std":[]},
-        "layout": {"mean":[],"std":[]},
-        "completion": {"mean":[],"std":[]},
-        "OOB":[],
-        "BBL":[],
-        "Nobj":[]
-    }
-    for i in [9,8,7,915]:
-        print(f"*** iter {i} ***")
-        eval_scene(i,"Design me a bedroom.")
-        # eval_scene(i,"A game room for a 6-year-old boy.")
+    # grades = {
+    #     "realism": {"mean":[],"std":[]},
+    #     "functionality":  {"mean":[],"std":[]},
+    #     "layout": {"mean":[],"std":[]},
+    #     "completion": {"mean":[],"std":[]},
+    #     "OOB":[],
+    #     "BBL":[],
+    #     "Nobj":[]
+    # }
+    # for i in [9,8,7,915]:
+    #     print(f"*** iter {i} ***")
+    #     eval_scene(i,"Design me a bedroom.")
+    #     # eval_scene(i,"A game room for a 6-year-old boy.")
 
-        with open(f"record/eval_iter_{i}.json","r") as f:
-            j = json.load(f)  
-        for key,value in j.items():  
-            grades[key]["mean"].append(value["mean"])
-            grades[key]["std"].append(value["std"])
+    #     with open(f"record/eval_iter_{i}.json","r") as f:
+    #         j = json.load(f)  
+    #     for key,value in j.items():  
+    #         grades[key]["mean"].append(value["mean"])
+    #         grades[key]["std"].append(value["std"])
 
-        with open(f"/home/yandan/workspace/infinigen/record_files/metric_{i}.json","r") as f:
-            j = json.load(f)  
-        for key,value in j.items():  
-            grades[key].append(value)
+    #     with open(f"/home/yandan/workspace/infinigen/record_files/metric_{i}.json","r") as f:
+    #         j = json.load(f)  
+    #     for key,value in j.items():  
+    #         grades[key].append(value)
             
     
-    with open(f"record/eval_iter_0_{i}.json","w") as f:
-        json.dump(grades, f) 
+    # with open(f"record/eval_iter_0_{i}.json","w") as f:
+    #     json.dump(grades, f) 
+    eval_scene(3, "You must design a scene iteratively using the tools I designed, it must have one large table with eight chairs placing properly next to the table with appropriate size and scale. You can choose to modify the scene by adding and eliminating objects. It should have a large table with comfortable seating for the family and guests.")

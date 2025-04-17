@@ -94,8 +94,10 @@ def get_action1(user_demand = "",iter = 1):
                                                                                         sceneinfo_prompt=sceneinfo_prompt,
                                                                                         idea_example=idea_example
                                                                                         )
-    gpt = GPT4(version='4o')
+    # gpt = GPT4(version='4.5',region="eastus2")
 
+    gpt = GPT4(version='4o')
+    
     prompt_payload = gpt.get_payload_scene_image(feedback_reflections_system_payload, feedback_reflections_user_payload,render_path=render_path)
     gpt_text_response = gpt(payload=prompt_payload, verbose=True)
     print(gpt_text_response)

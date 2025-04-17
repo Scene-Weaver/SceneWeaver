@@ -7,6 +7,28 @@ import sys
 
 sys.path.append("/home/yandan/workspace/digital-cousins/digital_cousins/models/blend/")
 from scipy.spatial.transform import Rotation
+import bpy
+import mathutils 
+import numpy as np
+
+
+def set_origin(imported_obj):
+    imported_obj.location = [0,0,0]
+    bbox_corners = [mathutils.Vector(corner) for corner in imported_obj.bound_box]
+
+    min_z = min(corner.z for corner in bbox_corners)
+    imported_obj.location.z -= min_z
+
+    mean_x = np.mean([corner.x for corner in bbox_corners])
+    imported_obj.location.x -= mean_x
+    mean_y = np.mean([corner.y for corner in bbox_corners])
+    imported_obj.location.y -= mean_y
+
+    pos_bias = [mean_x,mean_y,min_z]
+
+    bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='BOUNDS')
+    return imported_obj,pos_bias
+
 
 def add_light():
 
@@ -349,7 +371,7 @@ def load_glb(mesh_path):
 if __name__ == "__main__":
     basedir = "/mnt/fillipo/huangyue/recon_sim/7_anno_v4/export_stage2_sm"
     for scene_name in os.listdir(basedir):
-        # scene_name = "scene0470_00"
+        # scene_name = "scene0292_00"
         scene_path = f"{basedir}/{scene_name}"
         
         outdir = f"/mnt/fillipo/yandan/metascene/export_stage2_sm/{scene_name}"
@@ -372,9 +394,11 @@ if __name__ == "__main__":
                 obj_name = i.split(".")[0]
                 mesh_path = f"{scene_path}/{obj_name}.glb"
                 imported_obj = load_glb(mesh_path)
+                imported_obj,pos_bias = set_origin(imported_obj)
                 
                 save_dir = f"{outdir}/{obj_name}"
                 if not os.path.exists(save_dir):
                     os.mkdir(save_dir)
                 render_90degree(imported_obj, save_dir)
 
+        # break

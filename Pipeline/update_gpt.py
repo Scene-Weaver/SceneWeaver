@@ -11,6 +11,12 @@ Your task is to :
 2) tell me what problem it has, 
 3) help me solve the problem.
 
+You **MUST** modify objects' layout to **fix the problem as much as possible**.
+You can change the location, rotation, and size of the objects.
+For objects that remain unchanged, you must keep their original layout in the response rather than omit it. 
+For deleted objects, omit their layout in the response. 
+**You can not add any new object.**
+
 **3D Convention:**
 - Right-handed coordinate system.
 - The X-Y plane is the floor; the Z axis points up. The origin is at a corner (the left-top corner of the rendered image), defining the global frame.
@@ -52,10 +58,10 @@ You can consider the following factors:
 What problem do you think it has? 
 Then tell me how to solve these problems.
 
-Fianlly, according to the problem and thoughts, you should modify objects' layout to fix each of the problem.
+Fianlly, according to the problem and thoughts, you **MUST** modify objects' layout to **fix the problem as much as possible**.
 You can change the location, rotation, and size of the objects.
 For objects that remain unchanged, you must keep their original layout in the response rather than omit it. 
-For deleted objects, omit their layout in the response.
+For deleted objects, omit their layout in the response. **You can not add any new object.**
 Keep the objects inside the room. 
 
 Before returning the final results, you need to carefully confirm that each issue has been resolved. 
@@ -116,8 +122,11 @@ def update_scene_gpt(user_demand, ideas, iter, roomtype):
 
 
 if __name__ == "__main__":
-    user_demand = "A Bedroom"
-    ideas = "improve"
-    iter = 10
-    roomtype = user_demand
+    user_demand = 'You must design a scene iteratively using the tools I designed, it must have one large table with eight chairs placing properly next to the table with appropriate size and scale. You can choose to modify the scene by adding and eliminating objects. It should have a large table with comfortable seating for the family and guests.'
+
+    ideas = 'Reposition the existing chairs to face the table properly and add the missing eighth chair to complete the seating arrangement.'
+
+    iter = 1
+    roomtype = 'dining room'
+
     update_scene_gpt(user_demand, ideas, iter, roomtype)

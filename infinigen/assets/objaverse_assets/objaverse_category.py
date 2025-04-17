@@ -55,9 +55,18 @@ class ObjaverseCategoryFactory(ObjaverseFactory):
             imported_obj = load_pickled_3d_asset(filename)
         else: 
             object_names = Retriever.retrieve_object_by_cat(self.category)
-            object_names = [name for name, score in object_names if score > 30]
-            object_names = [obj_name for obj_name in object_names if os.path.exists(f"{basedir}/{obj_name}")]
-            object_names = object_names[:3]
+            
+            object_names_35 = [name for name, score in object_names if score > 35]
+            object_names_35 = [obj_name for obj_name in object_names_35 if os.path.exists(f"{basedir}/{obj_name}")]
+            if len(object_names_35)>=3:
+                object_names = object_names_35
+            else:
+                object_names_30 = [name for name, score in object_names if score > 30]
+                object_names_30 = [obj_name for obj_name in object_names_30 if os.path.exists(f"{basedir}/{obj_name}")]
+                object_names = object_names_30[:3]
+
+            import time
+            random.seed(time.time())
             random.shuffle(object_names)
 
             for obj_name in object_names:

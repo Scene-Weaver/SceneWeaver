@@ -53,6 +53,9 @@ back = {t.Subpart.Back, -t.Subpart.Top, -t.Subpart.Front}
 top = {t.Subpart.Top, -t.Subpart.Back, -t.Subpart.Bottom, -t.Subpart.Front, -t.Subpart.SupportSurface}
 # top = {t.Subpart.Top, -t.Subpart.Back, -t.Subpart.Bottom, -t.Subpart.Front}
 side = {-t.Subpart.Top, -t.Subpart.Bottom, -t.Subpart.Back, -t.Subpart.SupportSurface}
+
+side4 = {-t.Subpart.Top, -t.Subpart.Bottom, -t.Subpart.SupportSurface}
+
 front = {
     t.Subpart.Front,
     -t.Subpart.Top,
@@ -79,9 +82,12 @@ ontop = cl.StableAgainst(bottom, top)
 on = cl.StableAgainst(bottom, {t.Subpart.SupportSurface, -t.Subpart.Top})
 # on = cl.StableAgainst(bottom, {t.Subpart.SupportSurface}) 
 
+# front_against = cl.StableAgainst(
+#     front, side, margin=0.05, check_z=False
+# )  # check_z=False
 front_against = cl.StableAgainst(
-    front, side, margin=0.05, check_z=False
-)  # check_z=False
+    front, side4, margin=0.05, check_z=False
+)  # check_z=False #side4
 
 front_to_front = cl.StableAgainst(front, front, margin=0.05, check_z=False)
 

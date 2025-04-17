@@ -439,8 +439,12 @@ class Solver:
                     rotation = value[num]["rotation"] * math.pi / 180
                     size = value[num]["size"]
                     name = key
+
+                    if name not in self.name_mapping:
+                        print(f"Error: objects {name} has not mapping !! ")
+                        continue
                     module_and_class = self.name_mapping[name]
-                    if "parent" in value[num] and value[num]["parent"] != []:
+                    if "parent" in value[num] and value[num]["parent"] != [] and value[num]["parent"][0]!='newroom_0-0':
                         if value[num]["parent"][1] in ["on", "ontop"] or (
                             len(value[num]["parent"]) == 3
                             and value[num]["parent"][2] in ["on", "ontop"]
@@ -716,6 +720,7 @@ class Solver:
 
         for name, info in layouts.items():
             if name not in self.state.objs:
+                print(f"Error: object {name} is not in the current scene, obmit this object !!")
                 continue
             os = self.state.objs[name]
             obj = os.obj
@@ -862,6 +867,9 @@ class Solver:
                         temp_force_tags=found_tags,  # 临时强制标签
                     )
 
+                    target_name = class_name.lower()
+                    if target_name.endswith("factory"):
+                        target_name = target_name[:-7]
                     target_name = f"{np.random.randint(1e7)}_{class_name}"
                     # target_name = np.random.randint(1e7)+"_SofaFactory"
 

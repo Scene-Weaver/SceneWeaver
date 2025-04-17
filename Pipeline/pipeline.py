@@ -16,6 +16,7 @@ from match_scene import match_scene_id
 from update_ds import update_scene_ds
 from update_gpt import update_scene_gpt
 from evaluation import eval_scene
+from metascene_frontview import get_scene_frontview
 
 def get_action(user_demand, iter, ds=False):
     if iter == 0:
@@ -180,7 +181,7 @@ def gen_img_SD(SD_prompt, obj_id, obj_size):
     return img_filename
 
 
-def update_infinigen(action, iter, json_name, description=None, inplace=False):
+def update_infinigen(action, iter, json_name, description=None, inplace=False,invisible=False):
     j = {
         "iter": iter,
         "action": action,
@@ -193,7 +194,10 @@ def update_infinigen(action, iter, json_name, description=None, inplace=False):
     with open(f"/home/yandan/workspace/infinigen/args.json", "w") as f:
         json.dump(j, f, indent=4)
 
-    os.system("bash -i /home/yandan/workspace/infinigen/run.sh")
+    if invisible:
+        os.system("bash -i /home/yandan/workspace/infinigen/run_invisible.sh")
+    else:
+        os.system("bash -i /home/yandan/workspace/infinigen/run.sh")
 
     return
 
@@ -232,7 +236,7 @@ def update_ds(user_demand, ideas, iter, roomtype):
     return json_name
 
 
-iter = 0
+iter = 14
 # user_demand = "An office room for 8 people."
 user_demand = "You must design a scene iteratively using the tools I designed, it must have one large table with eight chairs placing properly next to the table with appropriate size and scale. You can choose to modify the scene by adding and eliminating objects. It should have a large table with comfortable seating for the family and guests."
 # user_demand = "Could you please design a Dining Room for me? Designed for meal gatherings, it should have a large table with comfortable seating for the family and guests, along with ambient lighting to enhance the dining experience."  # "A classic Chinese dining room."
@@ -241,7 +245,7 @@ while iter < 15:
     if iter == 0:
         action, ideas, roomtype = get_action(user_demand, iter)
         # action = "init_metascene"
-        # ideas = 'Add basic dining room layout with a large table and seating.'
+        # ideas = "Add basic dining room layout with a large table and eight chairs.",
         # roomtype = 'dining room'
         # action='init_gpt'
         # ideas='Create a foundational layout for an dining room.'
@@ -250,10 +254,13 @@ while iter < 15:
             json_name, roomsize = find_physcene(user_demand, ideas, roomtype)
             roomsize = get_roomsize(user_demand, ideas, roomsize, roomtype)
         elif action == "init_metascene":
-        #     json_name = "scene0292_00"
-        #     roomsize=[3.5,4.5]
+            # json_name = "scene0004_00"
+            # roomsize=[1.8,9.0]
             json_name, roomsize = find_metascene(user_demand, ideas, roomtype)
             roomsize = get_roomsize(user_demand, ideas, roomsize, roomtype)
+            success = get_scene_frontview(json_name)
+            if not success:
+                a = 1
         elif action == "init_gpt":
             json_name, roomsize = gen_gpt_scene(user_demand, ideas, roomtype)
             # json_name='/home/yandan/workspace/infinigen/Pipeline/record/init_gpt_results.json'
@@ -272,7 +279,7 @@ while iter < 15:
         update_infinigen(action, iter, json_name)
         if action == "init_physcene" or action == "init_metascene":
             json_name = add_init_relation(user_demand, ideas, roomtype)
-            update_infinigen("add_relation", iter, json_name, inplace=True)
+            update_infinigen("add_relation", iter, json_name, inplace=True,invisible=True)
     else:
         action = None
         while action is None:

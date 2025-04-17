@@ -211,6 +211,15 @@ def populate_state_placeholders_mid(state: State, filter=None, final=False, upda
             obj = unique_assets.objects[populate_obj_name]
             obj.location = placeholder.location
             obj.rotation_euler =placeholder.rotation_euler
+            obj.rotation_euler =placeholder.rotation_euler
+            
+            scale_x = placeholder.dimensions[0] / obj.dimensions[0]
+            scale_y = placeholder.dimensions[1] / obj.dimensions[1]
+            scale_z = placeholder.dimensions[2] / obj.dimensions[2]
+            obj.scale = (scale_x, scale_y, scale_z)
+            bpy.context.view_layer.objects.active = obj  # Set as active object
+            obj.select_set(True)  # Select the object
+            bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         else:
             if inst_seed=="8946473":
                 a = 1

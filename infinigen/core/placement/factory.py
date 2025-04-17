@@ -183,12 +183,13 @@ class AssetFactory:
         mean_x = np.mean([corner.x for corner in bbox_corners])
         imported_obj.location.x -= mean_x
         mean_y = np.mean([corner.y for corner in bbox_corners])
-        imported_obj.location.x -= mean_y
+        imported_obj.location.y -= mean_y
 
         pos_bias = [mean_x,mean_y,min_z]
 
         bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='BOUNDS')
         return imported_obj,pos_bias
+
 
 
 def make_asset_collection(

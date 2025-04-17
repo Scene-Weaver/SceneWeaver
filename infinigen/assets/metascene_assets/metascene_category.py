@@ -5,6 +5,8 @@
 # - Karhan Kayan
 
 
+from mathutils import Vector
+from infinigen.core.util import blender as butil
 
 import bpy
 from infinigen.assets.utils.object import new_bbox
@@ -16,6 +18,25 @@ import mathutils
 import numpy as np
 from infinigen.core import tagging
 from infinigen.core import tags as t
+
+def modify_obj_center(obj):
+    bbox = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
+
+    xx = [v[0] for v in bbox]
+    yy = [v[1] for v in bbox]
+    zz = [v[2] for v in bbox]
+
+    length = max(xx) - min(xx)
+    width = max(yy) - min(yy)
+    height = max(zz) - min(zz)
+
+    bottom_bias =  [(max(xx) + min(xx)) / 2, (max(xx) + min(xx)) / 2, min(zz)]
+
+    obj.location = -bottom_bias
+    # obj.location = [0,0,-height/2]
+    with butil.SelectObjects(obj):
+        bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
+    return obj,bottom_bias
 
 class MetaCategoryFactory(MetaSceneFactory):
     _category = None
@@ -34,35 +55,29 @@ class MetaCategoryFactory(MetaSceneFactory):
         print(self.asset_file)
         bpy.ops.import_scene.gltf(filepath=self.asset_file)
         imported_obj = bpy.context.selected_objects[0]
-        # uniform to front rotation
-        imported_obj.rotation_mode = 'XYZ'
-        radians = math.radians(self.front_view_angle+90)
-        self.rotation_orig = -radians
-
-        self.location_orig = list(imported_obj.location.copy())
-        
+        #scale
         self.scale = list(imported_obj.scale)
-        
-        imported_obj.rotation_euler[2] += radians  # Rotate around Z-a to face front
-        
-        if self.tag_support:
-            tag_support_surfaces(imported_obj)
-            
-        # from infinigen.core import tagging
-        # from infinigen.core import tags as t
-        # mask = tagging.tagged_face_mask(imported_obj, [t.Subpart.SupportSurface])
-
         bpy.context.view_layer.objects.active = (
             imported_obj  # Set as active object
         )
         imported_obj.select_set(True)  # Select the object
         bpy.ops.object.transform_apply(
-            location=False, rotation=True, scale=True
+            location=False, rotation=False, scale=True
         )
-
+        #location
+        self.location_orig = list(imported_obj.location.copy())
         imported_obj,pos_bias = self.set_origin(imported_obj)
         self.location_orig =  [self.location_orig[i]+pos_bias[i] for i in range(3)]
-
+        #rotation
+        # uniform to front rotation
+        imported_obj.rotation_mode = 'XYZ'
+        radians = math.radians(self.front_view_angle+90)
+        self.rotation_orig = -radians
+        imported_obj.rotation_euler[2] += radians  # Rotate around Z-a to face front
+        
+        if self.tag_support:
+            tag_support_surfaces(imported_obj)
+            
         if imported_obj:
             return imported_obj
         else:

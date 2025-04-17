@@ -7,7 +7,7 @@ import bpy
 import dill
 import trimesh
 import trimesh.parent
-
+import mathutils
 from infinigen.assets.materials import invisible_to_camera
 from infinigen.core import execute_tasks, init, placement, surface, tagging
 from infinigen.core import tags as t
@@ -22,7 +22,7 @@ from infinigen_examples.util.generate_indoors_util import (
     restrict_solving,
 )
 from infinigen_examples.util.visible import invisible_others, visible_others
-
+from infinigen_examples.steps.draw_bbox import add_rotated_bbox_wireframe
 
 def change_attr(obj, condition, replace_attr, visited=None, path=""):
     """
@@ -203,7 +203,7 @@ def export_relation(relation):
         -t.Subpart.Top,
     }:
         relname = "on"
-    elif child_tags == cu.front and parent_tags == cu.side and margin == 0.05:
+    elif child_tags == cu.front and parent_tags == cu.side4 and margin == 0.05: #side4
         relname = "front_against"
     elif child_tags == cu.front and parent_tags == cu.front and margin == 0.05:
         relname = "front_to_front"
@@ -242,9 +242,10 @@ def export_layout(state, solver, save_dir):
                 round(a, 2) for a in list(objinfo.obj.dimensions)
             ]
         else:
+            offset_vector = calc_position_bias(objinfo.obj)
             results["objects"][objkey] = dict()
             results["objects"][objkey]["location"] = [
-                round(a, 2) for a in list(objinfo.obj.location)
+                round(a, 2) for a in list(objinfo.obj.location+offset_vector)
             ]
             results["objects"][objkey]["rotation"] = [
                 round(a, 2) for a in list(objinfo.obj.rotation_euler)
@@ -273,6 +274,39 @@ def export_layout(state, solver, save_dir):
     with open(save_dir, "w") as f:
         json.dump(results, f, indent=4)
 
+def calc_position_bias(obj):
+
+    # 获取 bounding box 在对象局部空间中的 8 个点
+    bbox_corners = [mathutils.Vector(corner) for corner in obj.bound_box]
+
+    # # 计算 bounding box 中心（局部坐标）
+    # bbox_center_local = sum(bbox_corners, mathutils.Vector()) / 8 
+    # 假设 bbox_corners 是 obj.bound_box 中的 8 个局部坐标点
+
+    # 取底部的四个点（通常 Z 最小的四个）
+    min_z = min(corner.z for corner in bbox_corners)
+    bottom_corners = [corner for corner in bbox_corners if abs(corner.z - min_z) < 1e-4]
+
+    # 计算底部中心（bottom center）
+    bbox_bottom_center = sum(bottom_corners, mathutils.Vector()) / len(bottom_corners)
+
+    # 转换为世界坐标
+    bbox_center_world = obj.matrix_world @ bbox_bottom_center
+
+    # 获取对象原点（世界坐标）
+    origin_world = obj.location
+
+    # 计算偏移向量（底部中心 - 原点）
+    offset_vector = bbox_center_world - origin_world 
+
+    print(obj.name)
+    print("原点偏移向量 (world space):", offset_vector)
+    print("X 偏移:", offset_vector.x)
+    print("Y 偏移:", offset_vector.y)
+    print("Z 偏移:", offset_vector.z)
+    return offset_vector
+
+
 
 def render_scene(p, solved_bbox, camera_rigs, state, filename="debug.jpg"):
     rooms_meshed = butil.get_collection("placeholders:room_meshes")
@@ -300,13 +334,35 @@ def render_scene(p, solved_bbox, camera_rigs, state, filename="debug.jpg"):
     # camera_rigs[0].rotation_euler = [0,0,1.57]
     bpy.context.scene.camera = camera_rigs[0]
 
+    
+
     invisible_others(hide_placeholder=True)
     bpy.context.scene.render.resolution_x = 1920
     bpy.context.scene.render.resolution_y = 1080
-    bpy.context.scene.render.filepath = os.path.join(filename)
     bpy.context.scene.render.image_settings.file_format = "JPEG"
+    # bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Include alpha channel
+    # bpy.context.scene.render.film_transparent = True  # For Cycles
+    bpy.context.scene.render.filepath = os.path.join(filename)
     bpy.ops.render.render(write_still=True)
     visible_others()
+
+    get_bbox(state)
+
+    invisible_others(hide_all=True)
+    # Set resolution
+    bpy.context.scene.render.resolution_x = 1920
+    bpy.context.scene.render.resolution_y = 1080
+    # Use a file format that supports transparency
+    bpy.context.scene.render.image_settings.file_format = "PNG"
+    bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Include alpha channel
+    # Enable transparency
+    bpy.context.scene.render.film_transparent = True  # For Cycles
+    filename_bbox = filename.replace(".jpg","_bbox.png")
+    bpy.context.scene.render.filepath = os.path.join(filename_bbox)
+    bpy.ops.render.render(write_still=True)
+    visible_others(view_all=True)
+    
+    merge_two_image(filename,filename_bbox)
 
     # modified_output_path = bpy.path.abspath("render_8_coord.jpg")
     # world_to_image(filename, modified_output_path)
@@ -314,6 +370,43 @@ def render_scene(p, solved_bbox, camera_rigs, state, filename="debug.jpg"):
     bpy.context.scene.camera = None
     return
 
+def merge_two_image(background_imgfile,foregroung_imgfile):
+    from PIL import Image
+
+    # Load base JPEG image
+    jpeg_image = Image.open(background_imgfile).convert("RGB")
+
+    # Load PNG with transparency
+    png_image = Image.open(foregroung_imgfile).convert("RGBA")
+
+    # Ensure both images are the same size (optional: resize PNG)
+    png_image = png_image.resize(jpeg_image.size)
+
+    # Convert JPEG to RGBA so it can handle alpha
+    jpeg_rgba = jpeg_image.convert("RGBA")
+
+    # Paste PNG on top with transparency
+    combined = Image.alpha_composite(jpeg_rgba, png_image)
+
+    # Save result
+    filename = background_imgfile.replace(".jpg","_marked.jpg")
+    # combined.save("combined_image.png")  # Save as PNG to preserve transparency
+    combined.convert("RGB").save(filename, "JPEG", quality=95)
+
+    return
+
+def get_bbox(state):
+    for name in state.objs:
+        if name.startswith("window") or name == "newroom_0-0" or name == "entrance":
+            continue
+        obj = state.objs[name].obj
+        cat_name = name.split("_")[1]
+        if cat_name.endswith("Factory"):
+            cat_name = cat_name[:-7]
+        add_rotated_bbox_wireframe(obj,cat_name)
+    save_path = "debug.blend"
+    bpy.ops.wm.save_as_mainfile(filepath=save_path)
+    return 
 
 def world_to_image(image_path, output_path):
     import os
@@ -387,7 +480,7 @@ def save_record(state, solver, terrain, house_bbox, solved_bbox, iter, p):
     # state.trimesh_scene = None
     save_path = f"record_files/scene_{iter}.blend"
     bpy.ops.wm.save_as_mainfile(filepath=save_path)
-
+    
     for name in state.trimesh_scene.geometry.keys():
         state.trimesh_scene.geometry[name].fcl_obj = None
         state.trimesh_scene.geometry[name].col_obj = None
@@ -559,6 +652,7 @@ def load_record(iter):
 
     with open(f"record_files/state_{iter}.pkl", "rb") as file:
         state = dill.load(file)
+    
     for obj_name in state.objs.keys():
         # blender obj
         state.objs[obj_name].obj = bpy.data.objects.get(
@@ -618,7 +712,7 @@ def load_record(iter):
         # except:
         #     pass
 
-    # state.__post_init__()
+    state.__post_init__()
 
     solver.state = state
 

@@ -27,6 +27,7 @@ def record_scene(state, solver, terrain, house_bbox, solved_bbox, camera_rigs, i
         p, solved_bbox, camera_rigs, state, filename=f"record_scene/render_{iter}.jpg"
     )
 
+
     return
 
 

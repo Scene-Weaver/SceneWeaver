@@ -64,25 +64,25 @@ class SceneDesigner:
     duplicate_threshold: int = 2
 
     # Add general-purpose tools to the tool collection
-    available_tools0 = ToolCollection(
-        InitGPTExecute(), InitMetaSceneExecute(), InitPhySceneExecute()
-    )
     # available_tools0 = ToolCollection(
-    #         InitGPTExecute()
-    #     )
-    # available_tools1 = ToolCollection(
-    #     AddAcdcExecute(),
-    #     AddGPTExecute(),
-    #     AddRelationExecute(),
-    #     UpdateLayoutExecute(),
-    #     UpdateRotationExecute(),
-    #     UpdateSizeExecute(),
-    #     Terminate(),
-    #     RemoveExecute(),
+    #     InitGPTExecute(), InitMetaSceneExecute(), InitPhySceneExecute()
     # )
-    available_tools1 = ToolCollection(
-            Terminate()
+    available_tools0 = ToolCollection(
+            InitGPTExecute()
         )
+    available_tools1 = ToolCollection(
+        AddAcdcExecute(),
+        AddGPTExecute(),
+        AddRelationExecute(),
+        UpdateLayoutExecute(),
+        UpdateRotationExecute(),
+        UpdateSizeExecute(),
+        Terminate(),
+        RemoveExecute(),
+    )
+    # available_tools1 = ToolCollection(
+    #         Terminate()
+    #     )
     available_tools2 = ToolCollection(Terminate())
     current_step: int = 0
     memory = Memory()
@@ -181,7 +181,7 @@ class SceneDesigner:
             score_new = sum(score_new)
 
         if iter==0:
-            if score_new>=24:
+            if score_new>=20:
                 return True
             else:
                 return False
@@ -486,10 +486,15 @@ class SceneDesigner:
 
         results: List[str] = []
 
-        self.current_step = 18
+        self.current_step = 0
         save_dir = os.getenv("save_dir")
 
+        # if os.path.exists(f"{save_dir}/pipeline/memory_{self.current_step}.pkl"):
+        #     self.current_step += 1
+            
+        
         while self.current_step < self.max_steps and self.state != AgentState.FINISHED:
+            
             if self.current_step > 0:
                 with open(
                     f"{save_dir}/pipeline/memory_{self.current_step-1}.pkl", "rb"

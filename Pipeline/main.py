@@ -43,8 +43,18 @@ if __name__ == "__main__":
     #"Design me a clinic room."
     #"Design me an art studio."" 
     #"Design me a kitchen."
-    prompts = ["Design me a kitchen."] #computer room
-
-    for i in range(1):
-        prompt = prompts[0]
-        main(prompt, 2)
+    #"Design me a children room.", "Design me a game room.", "Design me a laboratory.","Design me a small bookstore.", 
+    #"Design me a waiting room.","Design me a laundry room."
+    #"Design me a restaurant room.",
+    #"Design me an office."
+    prompts = [
+               "Design me a laundry room."] #"Design me a gym.",, "Design me a classroom."] #computer room
+    for p in prompts:
+        for i in range(1):
+            prompt = p
+            main(prompt, i+2)
+            # try:
+            #     prompt = p
+            #     main(prompt, i+2)
+            # except:
+            #     continue

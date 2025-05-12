@@ -448,6 +448,12 @@ class Solver:
         return
 
     def retrieve_objav_assets(self, category_cnt, name_mapping=None):
+        save_dir = os.getenv("save_dir")
+        # if os.path.exists(f"{save_dir}/objav_files.json"):
+        #     with open(f"{save_dir}/objav_files.json", "r") as f:
+        #         self.LoadObjavFiles = json.load(f)
+        #     return
+        
         def get_case_insensitive(dictionary, key):
             return next(
                 (v for k, v in dictionary.items() if k.lower() == key.lower()), None
@@ -460,7 +466,9 @@ class Solver:
                 name = name.lower()
             if name_mapping is None or name_mapping[name] is None:
                 self.LoadObjavCnts[name] = get_case_insensitive(category_cnt, name)
-        with open(f"/home/yandan/workspace/infinigen/objav_cnts.json", "w") as f:
+        
+
+        with open(f"{save_dir}/objav_cnts.json", "w") as f:
             json.dump(self.LoadObjavCnts, f, indent=4)
 
         # cmd = """
@@ -469,8 +477,8 @@ class Solver:
         # python /home/yandan/workspace/infinigen/infinigen/assets/objaverse_assets/retrieve_idesign.py > run.log 2>&1
         # """
         # subprocess.run(["bash", "-c", cmd])
-        os.system("env -i bash --norc --noprofile -c ./retrieve.sh > run.log 2>&1")
-        with open(f"/home/yandan/workspace/infinigen/objav_files.json", "r") as f:
+        os.system(f'env -i bash --norc --noprofile -c "./retrieve.sh {save_dir}" > run.log 2>&1')
+        with open(f"{save_dir}/objav_files.json", "r") as f:
             self.LoadObjavFiles = json.load(f)
         return
 
@@ -1854,7 +1862,11 @@ class Solver:
             big_category_dict = {}
 
             for obj in data["objects"]:
-                obj_type = obj["type"]
+                try:
+                    obj_type = obj["type"]
+                except:
+                    obj_type = re.sub(r'[_]*\d+$', '', obj["new_object_id"]) 
+                
                 if obj_type not in big_category_dict:
                     big_category_dict[obj_type] = 0
                 big_category_dict[obj_type] += 1
@@ -1877,7 +1889,7 @@ class Solver:
             on_floor = False
             relation = None
 
-            category = "_".join(value["new_object_id"].split("_")[:-1])
+            category = re.sub(r'[_]*\d+$', '', key) 
 
             filter_domain = self.calc_filter_domain(
                 category,
@@ -1897,7 +1909,8 @@ class Solver:
             #     continue
             position = value["position"]
             position = [position["y"] + 0.14, position["x"] + 0.14, position["z"]]
-            position[2] = position[2] - z_dim / 2 + 0.14
+            # position[2] = position[2] - z_dim / 2 + 0.14
+            position[2] = position[2] + 0.14
             rotation = math.radians(value["rotation"]["z_angle"])  # + math.pi
             asset_file = self.LoadObjavFiles[category][0]
 
@@ -2162,7 +2175,9 @@ class Solver:
             big_category_dict = {}
 
             for obj in data["objects"]:
-                obj_type = obj["new_object_id"].split("-")[0]
+                obj_type = obj["new_object_id"].split("-")[0].split("|")[0].replace(" ","_")
+                if obj_type in ["window", "door"]:
+                    continue
                 if obj_type not in big_category_dict:
                     big_category_dict[obj_type] = 0
                 big_category_dict[obj_type] += 1
@@ -2185,7 +2200,7 @@ class Solver:
             on_floor = False
             relation = None
 
-            category = value["new_object_id"].split("-")[0].split("|")[0]
+            category = value["new_object_id"].split("-")[0].split("|")[0].replace(" ","_")
             if category in ["window", "door"]:
                 continue
             filter_domain = self.calc_filter_domain(

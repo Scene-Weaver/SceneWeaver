@@ -60,8 +60,9 @@ class ObjaverseCategoryFactory(ObjaverseFactory):
                 filename = self.asset_file
                 front_view_angle = 0
             else:
+                save_dir = os.getenv("save_dir")
                 with open(
-                    f"/home/yandan/workspace/infinigen/objav_files.json", "r"
+                    f"{save_dir}/objav_files.json", "r"
                 ) as f:
                     LoadObjavFiles = json.load(f)
                 filename = LoadObjavFiles[self.category][0]

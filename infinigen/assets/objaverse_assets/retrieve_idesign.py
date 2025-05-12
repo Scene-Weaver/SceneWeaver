@@ -121,73 +121,84 @@ def preprocess(input_string):
     return output
 
 
-f32 = np.float32
-half = torch.float16 if torch.cuda.is_available() else torch.bfloat16
-clip_model, clip_prep = load_openclip()
-torch.set_grad_enabled(False)
-
 
 if __name__ == "__main__":
     # with open("/home/yandan/workspace/infinigen/roominfo.json","r") as f:
     #     j = json.load(f)
     #     roomtype = j["roomtype"]
+    save_dir = sys.argv[1]
 
-    with open(f"/home/yandan/workspace/infinigen/objav_cnts.json", "r") as f:
-        LoadObjavCnts = json.load(f)
+    # if not os.path.exists(f"{save_dir}/objav_files.json"):
+    if True:
+        with open(f"{save_dir}/objav_cnts.json", "r") as f:
+            LoadObjavCnts = json.load(f)
 
-    LoadObjavFiles = dict()
-    for category, cnt in LoadObjavCnts.items():
-        # text = preprocess(f"A high-poly {roomtype} {category} in high quality")
-        text = preprocess(f"A high-poly {category} in high quality")
-        device = clip_model.device
-        tn = clip_prep(
-            text=[text], return_tensors="pt", truncation=True, max_length=76
-        ).to(device)
-        LoadObjavFiles[category] = []
-        enc = clip_model.get_text_features(**tn).float().cpu()
-        retrieved_objs = retrieve(enc, top=3, sim_th=0.1, filter_fn=get_filter_fn())
-        # import pdb
-        # pdb.set_trace()
-        for i in range(len(retrieved_objs)):
-            retrieved_obj = retrieved_objs[i]
-            if retrieved_obj["u"] == "90aae32de40c458e846a3705105e5cad":
-                continue
-            print("Retrieved object: ", retrieved_obj["u"])
-            processes = multiprocessing.cpu_count()
-            try:
-                objaverse_objects = objaverse.load_objects(
-                    uids=[retrieved_obj["u"]], download_processes=processes
-                )
-            except:
-                continue
-            file_path = list(objaverse_objects.values())[0]
-            
-            render_folder = file_path.replace(".glb", "")
-            if os.path.exists(f"{render_folder}/metadata.json"):
-                LoadObjavFiles[category].append(file_path)
-                break
+        f32 = np.float32
+        half = torch.float16 if torch.cuda.is_available() else torch.bfloat16
+        clip_model, clip_prep = load_openclip()
+        torch.set_grad_enabled(False)
 
-            # render
-            cmd = f"""
-            source ~/anaconda3/etc/profile.d/conda.sh
-            conda activate infinigen_python
-            python /home/yandan/workspace/infinigen/infinigen/assets/objaverse_assets/blender_render.py {file_path} > run1.log 2>&1
-            """
-            subprocess.run(["bash", "-c", cmd])
 
-            # front view
+        LoadObjavFiles = dict()
+        for category, cnt in LoadObjavCnts.items():
+            if category.lower() == "car":
+                LoadObjavFiles[category].append("/home/yandan/.objaverse/hf-objaverse-v1/glbs/000-068/45840e2136c44080b4c1e7521cce8db3.glb")
+            # text = preprocess(f"A high-poly {roomtype} {category} in high quality")
+            text = preprocess(f"A high-poly realistic {category} in high quality")
+            device = clip_model.device
+            tn = clip_prep(
+                text=[text], return_tensors="pt", truncation=True, max_length=76
+            ).to(device)
+            LoadObjavFiles[category] = []
+            enc = clip_model.get_text_features(**tn).float().cpu()
+            retrieved_objs = retrieve(enc, top=100, sim_th=0.1, filter_fn=get_filter_fn())
+            # import pdb
+            # pdb.set_trace()
+            for i in range(len(retrieved_objs)):
+                retrieved_obj = retrieved_objs[i]
+                if retrieved_obj["u"] in ["75e4d132d8e5480e99f915f0464aeff0","45a2ad85a21d46fabfe38d492ed3ec04",\
+                                        "90aae32de40c458e846a3705105e5cad","9d2946e980354264bf6be4a41f21f81e",\
+                                        "d7403315f4934dbd913578dc32f1962f","6cbddf0c4c5a4cacad14c6a8fa94f22c",\
+                                        "907649f7c56e478dac505f91318f59cc","6bdcf3960b434396b5a194f6685e2cbc",\
+                                        "0d3dd9d37ada4153b82c92e1fb4d4c4f","f3d62c8081994608a8b25b6db083cb1c",\
+                                        "bf375674c14f4ab8a0a16aad8cc99bab"                               ]:
+                    continue
+                print("Retrieved object: ", retrieved_obj["u"])
+                processes = multiprocessing.cpu_count()
+                try:
+                    objaverse_objects = objaverse.load_objects(
+                        uids=[retrieved_obj["u"]], download_processes=processes
+                    )
+                except:
+                    continue
+                file_path = list(objaverse_objects.values())[0]
+                
+                render_folder = file_path.replace(".glb", "")
+                if os.path.exists(f"{render_folder}/metadata.json"):
+                    LoadObjavFiles[category].append(file_path)
+                    break
 
-            cmd = f"""
-            source ~/anaconda3/etc/profile.d/conda.sh
-            conda activate layoutgpt
-            python /home/yandan/workspace/infinigen/Pipeline/app/tool/objaverse_frontview.py {render_folder} {category} > run2.log 2>&1
-            """
-            subprocess.run(["bash", "-c", cmd])
-            if os.path.exists(f"{render_folder}/metadata.json"):
-                LoadObjavFiles[category].append(file_path)
-                # break
-            else:
-                print(f"failed in processing {file_path}")
+                # render
+                cmd = f"""
+                source ~/anaconda3/etc/profile.d/conda.sh
+                conda activate infinigen_python
+                python /home/yandan/workspace/infinigen/infinigen/assets/objaverse_assets/blender_render.py {file_path} > run1.log 2>&1
+                """
+                subprocess.run(["bash", "-c", cmd])
 
-    with open(f"/home/yandan/workspace/infinigen/objav_files.json", "w") as f:
-        json.dump(LoadObjavFiles, f, indent=4)
+                # front view
+
+                cmd = f"""
+                source ~/anaconda3/etc/profile.d/conda.sh
+                conda activate layoutgpt
+                python /home/yandan/workspace/infinigen/Pipeline/app/tool/objaverse_frontview.py {render_folder} {category} > run2.log 2>&1
+                """
+                subprocess.run(["bash", "-c", cmd])
+                if os.path.exists(f"{render_folder}/metadata.json"):
+                    LoadObjavFiles[category].append(file_path)
+                    break
+                else:
+                    print(f"failed in processing {file_path}")
+
+        with open(f"{save_dir}/objav_files.json", "w") as f:
+            json.dump(LoadObjavFiles, f, indent=4)

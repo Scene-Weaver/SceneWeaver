@@ -15,7 +15,8 @@ For each object with a size issue:
 - Suggest corrected dimensions (length, width, height in meters).
 - Justify the correction based on real-world scale, spatial fit, or design logic.
 
-You MUST modify object sizes when needed to improve realism and function.
+You MUST modify object sizes when needed to improve realism and function. 
+You should consider objects in different pose. For example, a laptop's size is different when closed and open. If the size match one of the pose, do not change the size.
 You may also adjust the object’s position slightly to maintain spatial consistency after resizing.
 You must not add or remove any object.
 For objects that remain unchanged, include their original dimensions and layout in your response.

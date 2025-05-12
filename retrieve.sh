@@ -14,5 +14,6 @@ conda deactivate || true
 # Activate target environment
 conda activate idesign
 
-
-python infinigen/assets/objaverse_assets/retrieve_idesign.py
+save_dir=$1
+echo $save_dir
+python infinigen/assets/objaverse_assets/retrieve_idesign.py ${save_dir}

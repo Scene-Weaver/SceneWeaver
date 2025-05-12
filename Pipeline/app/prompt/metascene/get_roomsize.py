@@ -2,7 +2,7 @@ system_prompt = """
 I want to design a scene according to the user's demand. 
 I have retrieved a scene from the dataset. 
 I want to design the scene based on the retrieved scene. 
-The size of the final scene can be smaller or larger than the retrieved scene. 
+The size of the final scene should not be smaller than the retrieved scene. 
 Help me design the room size.
 
 You will reveive the following information:

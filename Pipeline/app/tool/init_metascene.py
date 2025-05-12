@@ -18,7 +18,7 @@ DESCRIPTION = """
 Load the most related scene from a Real2Sim indoor scene dataset as the basic scene.
 Ideal for generating foundational layouts for common room types.
 
-Supported Room Types: living room, dining room, bedroom, bathroom, kitchen, office, laundry room, and classroom.
+Only Supported Room Types: living room, dining room, bedroom, bathroom, kitchen, office, laundry room, and classroom.
 Use Case 1: Create a foundational layout.
 
 Strengths: Provides a ready-made layout based on real-world data. Rich of details.
@@ -148,8 +148,8 @@ class InitMetaSceneExecute(BaseTool):
 
         scenes = j["scenes"]
 
-        # scene_id = find_scene_id()
-        scene_id = "scene0651_00"
+        scene_id = find_scene_id()
+        # scene_id = "scene0592_00"
         json_name = scene_id
 
         with open(

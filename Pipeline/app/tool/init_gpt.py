@@ -38,7 +38,7 @@ class InitGPTExecute(BaseTool):
             },
             "roomtype": {
                 "type": "string",
-                "description": "(required) The roomtype to load.",
+                "description": "(required) The roomtype to load or generate.",
             },
         },
         "required": ["ideas", "roomtype"],

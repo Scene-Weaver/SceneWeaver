@@ -9,14 +9,12 @@ import logging
 import operator
 from dataclasses import dataclass
 
-import bpy
 import pandas as pd
 
 from infinigen.core.constraints import constraint_language as cl
 from infinigen.core.constraints import reasoning as r
 from infinigen.core.constraints.evaluator import eval_memo, node_impl
 from infinigen.core.constraints.example_solver.state_def import State
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 logger = logging.getLogger(__name__)
 

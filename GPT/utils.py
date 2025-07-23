@@ -1,9 +1,7 @@
 import json
 import math
 import random
-import re
 from typing import Any, Dict
-
 
 # def extract_json(input_string):
 #     # Using regex to identify the JSON structure in the string
@@ -22,6 +20,7 @@ from typing import Any, Dict
 #     else:
 #         print("No valid JSON found.")
 #         return None
+
 
 def extract_json(input_string):
     # Step 1: Extract the JSON string
@@ -154,7 +153,6 @@ def get_bbox_dims(obj_data: Dict[str, Any]):
     return {k: maxs[k] - mins[k] for k in ["x", "y", "z"]}
 
 
-
 def dict2str(d, indent=0):
     """
     Convert a dictionary into a formatted string.
@@ -200,7 +198,8 @@ def lst2str(lst):
     else:
         lst = list(map(str, lst))
         return "[" + ", ".join(lst) + "]"
-    
+
+
 if __name__ == "__main__":
     s = '{\n  "iter": 0,\n  "Analysis of current scene": "The current scene is completely empty with no layout or objects present. This is the initial stage of scene creation, and the primary goal is to establish a foundational layout that can later be enhanced with details and objects.",\n  "Thoughts": "Given that the scene is starting from scratch, the first step should be to create a basic layout. Method 1 (real2sim indoor scene data) and Method 2 (scene synthesis by neural network) are both suitable for this task. However, Method 1 is based on real-world data, providing a more accurate and realistic layout, which is crucial for establishing a solid foundation for the scene.",\n  "Recommendation": "For this iteration, I recommend using Method 1 (real2sim indoor scene data) to generate the initial layout. This method will provide a realistic and accurate foundation based on real indoor scenes, which is essential for building a believable 3D environment. Subsequent iterations can focus on adding details, objects, and further customization using other methods like Method 3 (image generation + 3D reconstruction) or Method 4 (Generated Scene Using GPT).",\n  "Method number": 1,\n  "Ideas": "Generate foundational layout for a common room type such as a living room or bedroom, depending on the user\'s specific needs.",\n  "RoomType": "Specify the room type based on user\'s requirement (e.g., living room, bedroom)"\n}'
 

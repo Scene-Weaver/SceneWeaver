@@ -8,7 +8,6 @@ from numpy.random import uniform
 
 import GPT
 from GPT.constants import OBJATHOR_ASSETS_DIR
-from GPT.retrieve import ObjectRetriever
 from infinigen.assets.material_assignments import AssetList
 from infinigen.assets.objects.cactus import CactusFactory
 from infinigen.assets.objects.monocot import MonocotFactory

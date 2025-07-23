@@ -11,7 +11,6 @@ import logging
 import math
 import os
 import re
-import subprocess
 from pathlib import Path
 
 import bpy
@@ -22,23 +21,6 @@ from tqdm import trange
 
 from infinigen.assets.metascene_assets import GeneralMetaFactory
 from infinigen.assets.objaverse_assets import GeneralObjavFactory
-from infinigen.assets.objaverse_assets.place_in_blender import (
-    delete_object_with_children,
-    get_children,
-)
-from infinigen.assets.objects import (
-    appliances,
-    bathroom,
-    decor,
-    elements,
-    lamp,
-    seating,
-    shelves,
-    table_decorations,
-    tables,
-    tableware,
-    wall_decorations,
-)
 from infinigen.assets.threedfront_assets import GeneralThreedFrontFactory
 from infinigen.core import tags as t
 
@@ -58,10 +40,9 @@ from infinigen.core.constraints.example_solver.geometry.dof import (
 )
 from infinigen.core.constraints.example_solver.propose_discrete import moves
 from infinigen.core.constraints.example_solver.state_def import State
-from infinigen.core.tags import Semantics, Subpart
+from infinigen.core.tags import Semantics
 from infinigen.core.util import blender as butil
 from infinigen_examples.util import constraint_util as cu
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 from . import moves, propose_relations, state_def
 from .annealing import SimulatedAnnealingSolver
@@ -471,13 +452,14 @@ class Solver:
             json.dump(self.LoadObjavCnts, f, indent=4)
 
         # cmd = """
-        # source ~/anaconda3/etc/profile.d/conda.sh
+        # source /home/yandan/anaconda3/etc/profile.d/conda.sh
         # conda activate idesign
-        # python /home/yandan/workspace/infinigen/infinigen/assets/objaverse_assets/retrieve_idesign.py > run.log 2>&1
+        # python ~/workspace/SceneWeaver/infinigen/assets/objaverse_assets/retrieve_idesign.py > run.log 2>&1
         # """
         # subprocess.run(["bash", "-c", cmd])
+       
         os.system(
-            f'env -i bash --norc --noprofile -c "./retrieve.sh {save_dir}" > run.log 2>&1'
+            f'env -i bash --norc --noprofile -c "./run/retrieve.sh {save_dir}" > run.log 2>&1'
         )
         with open(f"{save_dir}/objav_files.json", "r") as f:
             self.LoadObjavFiles = json.load(f)
@@ -497,8 +479,6 @@ class Solver:
             return self.state
         with open(json_name, "r") as f:
             info = json.load(f)
-        # with open(f"/home/yandan/workspace/infinigen/GPT/method_4_GPT_iter{iter}_results.json","r") as f:
-        #     info = json.load(f)
 
         self.Placement = info["Placement"]
         self.category_against_wall = info["category_against_wall"]
@@ -700,107 +680,95 @@ class Solver:
     ):
         self.del_no_relation_objects()
 
-        for i in range(100):
-            parent_obj_name = "5778780_LargeShelfFactory"
-            category = "BookStackFactory"
+        #{
+        #     "User demand": "BookStore",
+        #     "Roomsize": [3, 4],
+        #     "Relation": "on",
+        #     "Parent ID": "2245622_LargeShelfFactory"
+        #     "Number of new furniture": {"book":"30", "frame":"5", "vase":3},
+        # }
+        json_name = os.getenv("JSON_RESULTS")
+        if json_name == "Nothing":
+            return self.state
+        with open(json_name, "r") as f:
+            info = json.load(f)
 
-            against_wall = False
-            on_floor = False
-            relation = "on"
+        parent_obj_name = info["Parent ID"]
+        Placement = info["Number of new furniture"]
+        relation = info["Relation"]
 
-            filter_domain = self.calc_filter_domain(
-                category,
-                num=None,
-                on_floor=on_floor,
-                against_wall=against_wall,
-                parent_obj_name=parent_obj_name,
-                relation=relation,
-            )
-            import random
+        self.category_against_wall = None
+        self.category_on_the_floor = None
+        self.name_mapping = dict()
+        for k, v in info["name_mapping"].items():
+            self.name_mapping[k.lower()] = v
 
-            # module_and_class =  random.choice(["table_decorations.BookStackFactory"])
-            module_and_class = random.choice(
-                [
-                    "tableware.BottleFactory",
-                    "tableware.BowlFactory",
-                    "tableware.CanFactory",
-                    "tableware.CupFactory",
-                    "tableware.FoodBagFactory",
-                    "tableware.FoodBoxFactory",
-                    "tableware.FruitContainerFactory",
-                    "tableware.JarFactory",
-                    "tableware.PlateFactory",
-                    "tableware.PotFactory",
-                    "tableware.WineglassFactory",
+
+        for name,cnt in Placement.items():
+            for i in range(int(cnt)):
+                category = name
+                module_and_class = self.name_mapping[name.lower()]
+                against_wall = False
+                on_floor = False
+                
+
+                filter_domain = self.calc_filter_domain(
+                    category,
+                    num=None,
+                    on_floor=on_floor,
+                    against_wall=against_wall,
+                    parent_obj_name=parent_obj_name,
+                    relation=relation,
+                )
+                import random
+
+                if module_and_class is None:
+                    continue  # TODO, only support infinigen objects in this function right now, since no size info is provided for other assets.
+
+                module_name, class_name = module_and_class.rsplit(".", 1)
+                module = importlib.import_module("infinigen.assets.objects." + module_name)
+                class_obj = getattr(module, class_name)
+                gen_class = class_obj
+
+                # gen_class = GeneralObjavFactory
+                # size = [  ]
+                search_rels = filter_domain.relations
+                # 筛选出有效的关系，只选择非否定关系
+                search_rels = [
+                    rd for rd in search_rels if not isinstance(rd[0], cl.NegatedRelation)
                 ]
-            )
-            module_name, class_name = module_and_class.rsplit(".", 1)
-            module = importlib.import_module("infinigen.assets.objects." + module_name)
-            class_obj = getattr(module, class_name)
-            gen_class = class_obj
 
-            # gen_class = GeneralObjavFactory
-            # size = [  ]
-            search_rels = filter_domain.relations
-            # 筛选出有效的关系，只选择非否定关系
-            search_rels = [
-                rd for rd in search_rels if not isinstance(rd[0], cl.NegatedRelation)
-            ]
-
-            assign = propose_relations.find_given_assignments(
-                self.state, search_rels, parent_obj_name=parent_obj_name
-            )
-            for i, assignments in enumerate(assign):
-                found_tags = usage_lookup.usages_of_factory(gen_class)
-                move = moves.Addition(
-                    names=[
-                        f"{np.random.randint(1e6):04d}_{gen_class.__name__}"
-                    ],  # decided later # 随机生成一个名称，基于生成器类的名称
-                    gen_class=gen_class,  # 使用传入的生成器类
-                    relation_assignments=assignments,  # 传入分配的关系
-                    temp_force_tags=found_tags,  # 临时强制标签
+                assign = propose_relations.find_given_assignments(
+                    self.state, search_rels, parent_obj_name=parent_obj_name
                 )
+                for i, assignments in enumerate(assign):
+                    found_tags = usage_lookup.usages_of_factory(gen_class)
+                    move = moves.Addition(
+                        names=[
+                            f"{np.random.randint(1e6):04d}_{gen_class.__name__}"
+                        ],  # decided later # 随机生成一个名称，基于生成器类的名称
+                        gen_class=gen_class,  # 使用传入的生成器类
+                        relation_assignments=assignments,  # 传入分配的关系
+                        temp_force_tags=found_tags,  # 临时强制标签
+                    )
 
-                while True:
-                    target_name = f"{np.random.randint(1e7)}_{class_name}"
-                    if target_name not in self.state.objs:
-                        break
+                    while True:
+                        target_name = f"{np.random.randint(1e7)}_{class_name}"
+                        if target_name not in self.state.objs:
+                            break
 
-                success = move.apply_random(
-                    self.state,
-                    target_name,
-                    gen_class,
-                )
+                    success = move.apply_random(
+                        self.state,
+                        target_name,
+                        gen_class,
+                    )
 
-                # if not success:
-                #     bpy.data.objects.remove(self.state.objs[target_name].obj)
-                #     del self.state.objs[target_name]
-                break
+                    # if not success:
+                    #     bpy.data.objects.remove(self.state.objs[target_name].obj)
+                    #     del self.state.objs[target_name]
+                    break
 
         return self.state
-
-    def modify_graph(self):
-        import pdb
-
-        pdb.set_trace()
-        layouts = dict()
-
-        for iter in [0, 1, 3, 4, 5, 6, 7, 8, "8_coord"]:
-            filename = f"/home/yandan/workspace/infinigen/GPT/analysis{iter}.json"
-            with open(filename, "r") as f:
-                j = json.load(f)
-
-            for key, value in j.items():
-                layouts[key] = value
-
-        for name, info in layouts.items():
-            if name not in self.state.objs:
-                continue
-            os = self.state.objs[name]
-            iu.set_location(self.state.trimesh_scene, os.obj.name, info["location"])
-            iu.set_rotation(self.state.trimesh_scene, os.obj.name, info["rotation"])
-
-        return
 
     def add_relation(self):
         layouts = dict()
@@ -940,15 +908,6 @@ class Solver:
         for key, value in j.items():
             layouts[key] = value
 
-        # layouts = dict()
-
-        # for iter in ["_deepseek9_nothink"]:
-        #     filename = f"/home/yandan/workspace/infinigen/GPT/analysis{iter}.json"
-        #     with open(filename,"r") as f:
-        #         j = json.load(f)
-
-        #     for key,value in j.items():
-        #         layouts[key] = value
 
         for name, info in layouts.items():
             if name not in self.state.objs:
@@ -1497,9 +1456,7 @@ class Solver:
         var_assignments: dict[str, str],
         stage="large",  # large, medium, small
     ):
-        # basedir = "/home/yandan/workspace/PhyScene/3D_front/generate_filterGPN_clean"
         json_name = os.getenv("JSON_RESULTS")
-        # json_name = f"{basedir}/LivingDiningRoom-2954_livingroom.json"
 
         with open(json_name, "r") as f:
             Placement = json.load(f)
@@ -1655,9 +1612,7 @@ class Solver:
         with open(PATH_TO_SCENES, "r") as f:
             scene_info = json.load(f)
 
-        # filename = f"/home/yandan/workspace/infinigen/Pipeline/record/acdc_output/step_3_output/scene_2/scene_2_info.json"
-        # with open(filename,"r") as f:
-        #     scene_info = json.load(f)
+
 
         supporter = scene_info["supporter"]
 

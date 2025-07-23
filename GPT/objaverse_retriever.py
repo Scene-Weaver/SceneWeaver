@@ -29,10 +29,10 @@ class ObjathorRetriever:
         self.database = {**objathor_annotations, **thor_annotations}
 
         objathor_clip_features_dict = compress_pickle.load(
-            os.path.join(OBJATHOR_FEATURES_DIR, f"clip_features.pkl")
+            os.path.join(OBJATHOR_FEATURES_DIR, "clip_features.pkl")
         )  # clip features
         objathor_sbert_features_dict = compress_pickle.load(
-            os.path.join(OBJATHOR_FEATURES_DIR, f"sbert_features.pkl")
+            os.path.join(OBJATHOR_FEATURES_DIR, "sbert_features.pkl")
         )  # sbert features
         assert (
             objathor_clip_features_dict["uids"] == objathor_sbert_features_dict["uids"]

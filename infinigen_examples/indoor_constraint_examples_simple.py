@@ -10,20 +10,12 @@ from numpy.random import uniform
 
 from infinigen.assets.objects import (
     appliances,
-    bathroom,
-    decor,
-    elements,
-    lamp,
     seating,
     shelves,
-    table_decorations,
-    tables,
-    tableware,
-    wall_decorations,
 )
 from infinigen.core.constraints import constraint_language as cl
 from infinigen.core.constraints import usage_lookup
-from infinigen.core.tags import Semantics, Subpart
+from infinigen.core.tags import Semantics
 
 from .indoor_asset_semantics import home_asset_usage
 from .util import constraint_util as cu

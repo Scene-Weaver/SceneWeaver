@@ -1,31 +1,27 @@
-from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
-    create_outdoor_backdrop,
-    hide_other_rooms,
-    place_cam_overhead,
-    restrict_solving,
-)
+import bpy
 
+from infinigen.core import tags as t
 from infinigen.core.constraints.example_solver import (
     Solver,
-    greedy,
-    populate,
     state_def,
 )
 from infinigen_examples.util import constraint_util as cu
-from infinigen.core import tags as t
-import os
-import bpy
-def build_room_structure(p,overrides,stages,logger,output_folder,scene_seed,consgraph):
-# region room structure
+from infinigen_examples.util.generate_indoors_util import (
+    apply_greedy_restriction,
+)
+
+
+def build_room_structure(
+    p, overrides, stages, logger, output_folder, scene_seed, consgraph
+):
+    # region room structure
     if overrides.get("restrict_single_supported_roomtype", False):
         restrict_parent_rooms = t.Semantics.NewRoom
-               
+
         logger.info(f"Restricting to {restrict_parent_rooms}")
         apply_greedy_restriction(stages, restrict_parent_rooms, cu.variable_room)
 
     solver = Solver(output_folder=output_folder)
-
 
     def solve_rooms():
         return solver.solve_rooms(scene_seed, consgraph, stages["rooms"])
@@ -43,7 +39,7 @@ def build_room_structure(p,overrides,stages,logger,output_folder,scene_seed,cons
                         "region": region,
                         "edit_object": bpy.context.edit_object,
                     }
-                    bpy.ops.view3d.view_all(override) 
+                    bpy.ops.view3d.view_all(override)
 
     # endregion
-    return state,solver,override
+    return state, solver, override

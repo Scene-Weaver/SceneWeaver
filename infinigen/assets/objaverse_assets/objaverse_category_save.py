@@ -4,22 +4,15 @@
 # Authors:
 # - Karhan Kayan
 
-import os
-import random
 
 import bpy
 
-from GPT.constants import OBJATHOR_ASSETS_DIR
-from GPT.objaverse_retriever import ObjathorRetriever
 from GPT.retrieve import ObjectRetriever
 from infinigen.assets.utils.object import new_bbox
 from infinigen.core.tagging import tag_support_surfaces
-from infinigen.core.util.math import FixedSeed
 
 from .base import ObjaverseFactory
-from .load_asset import load_pickled_3d_asset
-
-from .retrieve_idesign import clip_model,clip_prep,preprocess,retrieve,get_filter_fn
+from .retrieve_idesign import clip_model, clip_prep, get_filter_fn, preprocess, retrieve
 
 global Retriever
 Retriever = ObjectRetriever()
@@ -49,11 +42,10 @@ class ObjaverseCategoryFactory(ObjaverseFactory):
         self.z_dim = self._z_dim
 
     def create_asset(self, **params) -> bpy.types.Object:
-        
         text = preprocess("A high-poly " + self.category + ", high quality")
         device = clip_model.device
         tn = clip_prep(
-            text=[text], return_tensors='pt', truncation=True, max_length=76
+            text=[text], return_tensors="pt", truncation=True, max_length=76
         ).to(device)
 
         enc = clip_model.get_text_features(**tn).float().cpu()
@@ -64,7 +56,7 @@ class ObjaverseCategoryFactory(ObjaverseFactory):
         imported_obj = bpy.context.selected_objects[0]
         self.set_origin(imported_obj)
         imported_obj.location = [0, 0, 0]
-        imported_obj.rotation_euler = [0,0,0]
+        imported_obj.rotation_euler = [0, 0, 0]
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
 
         # update scale

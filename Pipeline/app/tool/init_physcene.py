@@ -1,17 +1,13 @@
 import json
 import os
 import random
-import sys
-from typing import Dict
 
 import numpy as np
-from gpt import GPT4
 
 from app.tool.add_relation import add_relation
 from app.tool.base import BaseTool
 from app.tool.get_roomsize import get_roomsize
 from app.tool.update_infinigen import update_infinigen
-from app.utils import dict2str, extract_json
 
 DESCRIPTION = """
 Using neural network to generate a scene as the basic scene.
@@ -79,7 +75,7 @@ class InitPhySceneExecute(BaseTool):
                 }
                 json.dump(info, f, indent=4)
             os.system(
-                f"cp {save_dir}/roominfo.json /home/yandan/workspace/infinigen/roominfo.json"
+                f"cp {save_dir}/roominfo.json ~/workspace/SceneWeaver/roominfo.json"
             )
             success = update_infinigen(action, iter, json_name, ideas=ideas)
             assert success
@@ -92,15 +88,15 @@ class InitPhySceneExecute(BaseTool):
             )
             assert success
 
-            return f"Successfully generate a scene by neural network."
-        except Exception as e:
-            return f"Error generating a scene by neural network."
+            return "Successfully generate a scene by neural network."
+        except Exception:
+            return "Error generating a scene by neural network."
 
     def find_physcene(self, user_demand, ideas, roomtype):
         roomtype = roomtype.lower()
         if roomtype.endswith("room"):
             roomtype = roomtype[:-4].strip()
-        basedir = "/home/yandan/workspace/PhyScene/3D_front/generate_filterGPN_clean/"
+        basedir = "~/workspace/PhyScene/3D_front/generate_filterGPN_clean/"
         files = os.listdir(basedir)
         random.shuffle(files)
         for filename in files:

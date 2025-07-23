@@ -1,10 +1,6 @@
 import json
 import os
-import random
-import sys
-from typing import Dict
 
-import numpy as np
 from gpt import GPT4
 
 from app.prompt.gpt.update_size import system_prompt, user_prompt
@@ -51,9 +47,9 @@ class UpdateSizeExecute(BaseTool):
             # json_name = update_ds(user_demand,ideas,iter,roomtype)
             success = update_infinigen(action, iter, json_name, ideas=ideas)
             assert success
-            return f"Successfully Modify sizes with GPT."
-        except Exception as e:
-            return f"Error Modify layout with GPT"
+            return "Successfully Modify sizes with GPT."
+        except Exception:
+            return "Error Modify layout with GPT"
 
     def update_scene_gpt(self, user_demand, ideas, iter, roomtype):
         save_dir = os.getenv("save_dir")
@@ -85,9 +81,9 @@ class UpdateSizeExecute(BaseTool):
         gpt_text_response = gpt(payload=prompt_payload, verbose=True)
         print(gpt_text_response)
 
-        json_name = f"{save_dir}/pipeline/update_gpt_results_{iter}_response.json"
-        with open(json_name, "w") as f:
-            json.dump(gpt_text_response, f, indent=4)
+        # json_name = f"{save_dir}/pipeline/update_gpt_results_{iter}_response.json"
+        # with open(json_name, "w") as f:
+        #     json.dump(gpt_text_response, f, indent=4)
 
         new_layout = extract_json(gpt_text_response)
 

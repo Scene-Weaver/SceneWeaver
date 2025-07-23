@@ -1,9 +1,7 @@
-import argparse
 import json
 import os
 import socket
 import subprocess
-import time
 
 
 def send_command(host="localhost", port=12345, command=None):
@@ -58,7 +56,7 @@ def update_infinigen(
     with open(argsfile, "w") as f:
         json.dump(j, f, indent=4)
     os.system(
-        f"cp {save_dir}/roominfo.json /home/yandan/workspace/infinigen/roominfo.json"
+        f"cp {save_dir}/roominfo.json ../run/roominfo.json"
     )
 
     # # if invisible:
@@ -67,12 +65,12 @@ def update_infinigen(
         cmd = f"""
         source ~/anaconda3/etc/profile.d/conda.sh
         conda activate infinigen_python
-        cd /home/yandan/workspace/infinigen
-        python -m infinigen_examples.generate_indoors --seed 0 --save_dir {save_dir} --task coarse --output_folder outputs/indoors/coarse_expand_whole_nobedframe -g fast_solve.gin overhead.gin studio.gin -p compose_indoors.terrain_enabled=False compose_indoors.invisible_room_ceilings_enabled=True > /home/yandan/workspace/infinigen/Pipeline/run.log 2>&1
+        cd ~/workspace/SceneWeaver
+        python -m infinigen_examples.generate_indoors --seed 0 --save_dir {save_dir} --task coarse --output_folder outputs/indoors/coarse_expand_whole_nobedframe -g fast_solve.gin overhead.gin studio.gin -p compose_indoors.terrain_enabled=False compose_indoors.invisible_room_ceilings_enabled=True > ~/workspace/SceneWeaver/Pipeline/run.log 2>&1
         """
         subprocess.run(["bash", "-c", cmd])
         # else:
-        #     os.system("bash -i /home/yandan/workspace/infinigen/run.sh > run.log 2>&1")
+        #     os.system("bash -i ~/workspace/SceneWeaver/run.sh > run.log 2>&1")
     else:
         command = {
             "action": action,

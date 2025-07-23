@@ -25,7 +25,6 @@ from infinigen.core.constraints.example_solver.room.constants import (
     WALL_THICKNESS,
 )
 from infinigen.core.tags import Subpart
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +152,7 @@ def check_init_valid(
     """
     # 检查 obj_planes 是否为空或超出限制（最大3个平面）。
     if len(obj_planes) == 0:
-        return False, None, None #TODO YYD
+        return False, None, None  # TODO YYD
         # raise ValueError(f"{check_init_valid.__name__} for {name=} got {obj_planes=}")
     if len(obj_planes) > 3:
         raise ValueError(
@@ -361,7 +360,7 @@ def apply_relations_surfacesample(
         # visible_others()
         if name == "1980528_CountertopFactory":
             a = 1
-       
+
         obj_plane, parent_plane = state.planes.get_rel_state_planes(
             state, name, relation_state, closest_surface=closest_surface
         )

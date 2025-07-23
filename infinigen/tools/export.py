@@ -7,7 +7,6 @@ import argparse
 import logging
 import math
 import shutil
-import subprocess
 from pathlib import Path
 
 import bpy

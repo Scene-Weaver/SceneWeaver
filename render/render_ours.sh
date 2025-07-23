@@ -1,8 +1,8 @@
 #!/bin/bash
 
 outdir="/mnt/fillipo/yandan/scenesage/record_scene/manus/"
-blend="/home/yandan/software/blender-4.2.0-linux-x64/blender"
-script="/home/yandan/workspace/infinigen/render/render_single_scene.py"
+blend="~/software/blender-4.2.0-linux-x64/blender"
+script="~/workspace/SceneWeaver/render/render_single_scene.py"
 
 for roomtype in "$outdir"/*; do
   # roomtype="/mnt/fillipo/yandan/scenesage/record_scene/manus/0_bedroom/"

@@ -20,7 +20,7 @@ def main(prompt, i):
 
         save_dir = save_dir + "_" + str(i)
         os.system(
-            f"cp {save_dir}/roominfo.json /home/yandan/workspace/infinigen/roominfo.json"
+            f"cp {save_dir}/roominfo.json ../run/roominfo.json"
         )
 
         if not os.path.exists(save_dir):

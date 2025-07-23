@@ -57,7 +57,7 @@ if __name__ == "__main__":
             args.iter = j["iter"]
             args.inplace = j["inplace"]
     if save_dir != "debug/" and save_dir != "debug":
-        with open("/home/yandan/workspace/infinigen/roominfo.json", "r") as f:
+        with open("run/roominfo.json", "r") as f:
             j = json.load(f)
             save_dir = j["save_dir"]
 

@@ -1,8 +1,9 @@
 import json
 import os
-import time
 import sys
-sys.path.append("/home/yandan/workspace/infinigen/Pipeline")
+import time
+
+sys.path.append("~/workspace/SceneWeaver/Pipeline")
 from gpt import GPT4
 from PIL import Image
 
@@ -77,7 +78,7 @@ def filter_side_img(candidates_fpaths, widths, T=0.3):
         return candidates_fpaths, 1
 
 
-def has_front(gpt, category,verbose=False):
+def has_front(gpt, category, verbose=False):
     system_prompt = (
         "You will been given an category name. You need to check if the object in this category has a standard 'front view' \n"
         + "1. The front view is often characterized by the most significant or most visible face of the object.\n"
@@ -101,7 +102,7 @@ def has_front(gpt, category,verbose=False):
         return False
 
 
-def get_scene_frontview(scene_name,verbose=False):
+def get_scene_frontview(scene_name, verbose=False):
     gpt = GPT4(version="4.1")
     inbasedir = "/mnt/fillipo/huangyue/recon_sim/7_anno_v4/export_stage2_sm"
     outbasedir = "/mnt/fillipo/yandan/metascene/export_stage2_sm"
@@ -118,7 +119,7 @@ def get_scene_frontview(scene_name,verbose=False):
 
     if os.path.exists(outinfodir):
         if verbose:
-            print("already processed ",scene_name)
+            print("already processed ", scene_name)
         return True
     if verbose:
         print("processing ", scene_name)

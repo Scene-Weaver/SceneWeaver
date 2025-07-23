@@ -5,10 +5,12 @@ Your goal is to follow the user demand and ideas to add objects in the scene whi
 
 You will receive:
 1. The user demand you need to follow.
-2. Room size, including length and width in meters.
-3. The layout of current scene, including each object's X-Y-Z Position, Z rotation, size (x_dim, y_dim, z_dim), as well as relation info with parents.
-4. Layout of door and windows.
-5. A rendered image of the entire scene taken from the top view.
+2. Roomtype
+3. Ideas for this step (only for reference)
+4. Room size, including length and width in meters.
+5. The layout of current scene, including each object's X-Y-Z Position, Z rotation, size (x_dim, y_dim, z_dim), as well as relation info with parents.
+6. Layout of door and windows.
+7. A rendered image of the entire scene taken from the top view.
 
 You are working in a 3D scene environment with the following conventions:
 

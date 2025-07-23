@@ -4,12 +4,11 @@
 # Authors: David Yan, Beining Han
 
 # Acknowledgement: This file draws inspiration from https://docs.omniverse.nvidia.com/isaacsim/latest/index.html
-# sys.path.append("/home/yandan/.local/share/ov/pkg/isaac-sim-2023.1.1/exts/omni.isaac.core/")
-# sys.path.append("/home/yandan/.local/share/ov/pkg/isaac-sim-2023.1.1/kit/kernel/py/")
-# sys.path.append("/home/yandan/.local/share/ov/pkg/isaac-sim-2023.1.1/kit/exts/omni.usd")
+# sys.path.append("~/.local/share/ov/pkg/isaac-sim-2023.1.1/exts/omni.isaac.core/")
+# sys.path.append("~/.local/share/ov/pkg/isaac-sim-2023.1.1/kit/kernel/py/")
+# sys.path.append("~/.local/share/ov/pkg/isaac-sim-2023.1.1/kit/exts/omni.usd")
 # import tongverse as tv
 import json
-import sys
 
 import numpy as np
 import omni
@@ -20,7 +19,7 @@ from omni.isaac.core.utils.nucleus import get_assets_root_path
 from omni.isaac.core.utils.prims import create_prim
 from omni.isaac.kit import SimulationApp
 from omni.kit.commands import execute as omni_exec
-from pxr import Sdf, Usd, UsdGeom, UsdLux
+from pxr import Usd, UsdGeom, UsdLux
 
 # ruff: noqa: E402
 enable_extension("omni.isaac.examples")

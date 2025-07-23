@@ -1,7 +1,7 @@
-import threading
 import json
+import threading
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel, Field
 
@@ -33,7 +33,6 @@ class ProxySettings(BaseModel):
     server: str = Field(None, description="Proxy server address")
     username: Optional[str] = Field(None, description="Proxy username")
     password: Optional[str] = Field(None, description="Proxy password")
-
 
 
 # class SandboxSettings(BaseModel):
@@ -83,7 +82,7 @@ class Config:
         config_path = root / "config" / "config.json"
         if config_path.exists():
             return config_path
-       
+
         raise FileNotFoundError("No configuration file found in config directory")
 
     def _load_config(self) -> dict:
@@ -98,10 +97,10 @@ class Config:
             k: v for k, v in raw_config.get("llm", {}).items() if isinstance(v, dict)
         }
 
-        with open(base_llm.get("api_key"),"r") as f:
+        with open(base_llm.get("api_key"), "r") as f:
             lines = f.readlines()
         API_KEY = lines[0].strip()
-        
+
         default_settings = {
             "model": base_llm.get("model"),
             "base_url": base_llm.get("base_url"),
@@ -112,7 +111,6 @@ class Config:
             "api_type": base_llm.get("api_type", ""),
             "api_version": base_llm.get("api_version", ""),
         }
-
 
         config_dict = {
             "llm": {

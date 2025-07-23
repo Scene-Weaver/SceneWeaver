@@ -7,7 +7,6 @@ This script demonstrates how to communicate with the modified generate_indoors_m
 import argparse
 import json
 import socket
-import time
 
 
 def send_command(host="localhost", port=12345, command=None):

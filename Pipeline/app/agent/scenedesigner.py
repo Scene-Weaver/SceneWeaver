@@ -1,10 +1,8 @@
 import json
 import os
-from contextlib import asynccontextmanager
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 
 import dill
-from pydantic import BaseModel, Field, model_validator
 
 from app.config import config
 from app.evaluation import eval_scene
@@ -24,6 +22,7 @@ from app.schema import (
 )
 from app.tool.add_acdc import AddAcdcExecute
 from app.tool.add_gpt import AddGPTExecute
+from app.tool.add_crowd import AddCrowdExecute
 from app.tool.add_relation import AddRelationExecute
 from app.tool.init_gpt import InitGPTExecute
 from app.tool.init_metascene import InitMetaSceneExecute
@@ -34,7 +33,7 @@ from app.tool.tool_collection import ToolCollection
 from app.tool.update_layout import UpdateLayoutExecute
 from app.tool.update_rotation import UpdateRotationExecute
 from app.tool.update_size import UpdateSizeExecute
-from app.utils import dict2str, encode_image, extract_json, lst2str
+from app.utils import dict2str, encode_image, lst2str
 
 
 class SceneDesigner:
@@ -68,14 +67,15 @@ class SceneDesigner:
         InitGPTExecute(), InitMetaSceneExecute(), InitPhySceneExecute()
     )
     available_tools1 = ToolCollection(
-        AddAcdcExecute(),
-        AddGPTExecute(),
-        AddRelationExecute(),
-        UpdateLayoutExecute(),
-        UpdateRotationExecute(),
-        UpdateSizeExecute(),
-        Terminate(),
-        RemoveExecute(),
+        # AddAcdcExecute(),
+        # AddGPTExecute(),
+        AddCrowdExecute(),
+        # AddRelationExecute(),
+        # UpdateLayoutExecute(),
+        # UpdateRotationExecute(),
+        # UpdateSizeExecute(),
+        # Terminate(),
+        # RemoveExecute(),
     )
 
     available_tools2 = ToolCollection(Terminate())
@@ -103,7 +103,7 @@ class SceneDesigner:
                 isvalid = self.check_valid(self.current_step - 1)
             except:
                 print(
-                    f"Error: Failed in evaluation in iter {iter-1} !!! Go back to the last iter."
+                    f"Error: Failed in evaluation in iter {self.current_step-1} !!! Go back to the last iter."
                 )
                 isvalid = False
             if not isvalid:
@@ -415,13 +415,15 @@ class SceneDesigner:
             logger.info(f"🔧 Activating tool: '{name}'...")
             result = self.available_tools.execute(name=name, tool_input=args)
 
+            assert "Error" not in result
+
             # Handle special tools
             self._handle_special_tool(name=name, result=result)
 
             # # Check if result is a ToolResult with base64_image
             # if hasattr(result, "base64_image") and result.base64_image:
             #     # Store the base64_image for later use in tool_message
-            #     basedir = "/home/yandan/workspace/infinigen/record_scene"
+            #     basedir = "~/workspace/SceneWeaver/record_scene"
             #     self._current_base64_image = f"{basedir}/render_{self.current_step}_marked.jpg"
 
             # # Format result for display
@@ -496,7 +498,7 @@ class SceneDesigner:
         memory_path = f"{save_dir}/pipeline/memory_{self.current_step}.pkl"
         while os.path.exists(memory_path):
             os.system(
-                f"cp {save_dir}/roominfo.json /home/yandan/workspace/infinigen/roominfo.json"
+                f"cp {save_dir}/roominfo.json ../run/roominfo.json"
             )
             self.current_step += 1
             memory_path = f"{save_dir}/pipeline/memory_{self.current_step}.pkl"
@@ -552,7 +554,7 @@ class SceneDesigner:
             self.current_step += 1
             if self.tool_calls[0].function.name == "terminate":
                 self.state = AgentState.FINISHED
-                results.append(f"Terminated: successfullly stop.")
+                results.append("Terminated: successfullly stop.")
 
         if self.current_step >= self.max_steps:
             self.current_step = 0

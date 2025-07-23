@@ -1,34 +1,42 @@
+import bpy
+import numpy as np
+from numpy import deg2rad
+
+from infinigen import repo_root
+from infinigen.assets.materials import invisible_to_camera
+from infinigen.assets.objects.wall_decorations.skirting_board import make_skirting_board
+from infinigen.assets.placement.floating_objects import FloatingObjectPlacement
+from infinigen.assets.utils.decorate import read_co
+from infinigen.core import tags as t
+from infinigen.core.constraints import constraint_language as cl
+from infinigen.core.constraints import reasoning as r
+from infinigen.core.constraints.example_solver.room import decorate as room_dec
+from infinigen.core.constraints.example_solver.room.constants import WALL_HEIGHT
+from infinigen.core.placement import camera as cam_util
 from infinigen.core.util import blender as butil
+from infinigen.core.util.camera import points_inview
 from infinigen.core.util.test_utils import (
     import_item,
     load_txt_list,
 )
-
-from infinigen import repo_root
-from infinigen.assets.placement.floating_objects import FloatingObjectPlacement
-from infinigen.core.placement import camera as cam_util
-from infinigen.core.constraints import constraint_language as cl
-from infinigen.core import tags as t
-from infinigen.core.constraints import reasoning as r
-from infinigen.core.constraints.example_solver.room import decorate as room_dec
-from infinigen.assets.objects.wall_decorations.skirting_board import make_skirting_board
-import bpy
-from infinigen.assets.materials import invisible_to_camera
 from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
     create_outdoor_backdrop,
     hide_other_rooms,
-    place_cam_overhead,
-    restrict_solving,
 )
-from infinigen.core.constraints.example_solver.room.constants import WALL_HEIGHT
-from infinigen.core.util.camera import points_inview
 
-from numpy import deg2rad
-from infinigen.assets.utils.decorate import read_co
 
-import numpy as np
-def finalize_scene(overrides,stages,state,solver,output_folder,p,terrain,solved_rooms,house_bbox,camera_rigs):
+def finalize_scene(
+    overrides,
+    stages,
+    state,
+    solver,
+    output_folder,
+    p,
+    terrain,
+    solved_rooms,
+    house_bbox,
+    camera_rigs,
+):
     def place_floating():
         pholder_rooms = butil.get_collection("placeholders:room_meshes")
         pholder_cutters = butil.get_collection("placeholders:portal_cutters")
@@ -112,7 +120,6 @@ def finalize_scene(overrides,stages,state,solver,output_folder,p,terrain,solved_
         rooms_split["ceiling"].objects,
         use_chance=False,
     )
-    
 
     # state.print()
     state.to_json(output_folder / "solve_state.json")
@@ -136,8 +143,6 @@ def finalize_scene(overrides,stages,state,solver,output_folder,p,terrain,solved_
         )
 
     p.run_stage("invisible_room_ceilings", invisible_room_ceilings, use_chance=False)
-
-    
 
     p.run_stage(
         "hide_other_rooms",

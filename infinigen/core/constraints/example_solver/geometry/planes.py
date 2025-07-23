@@ -422,8 +422,6 @@ class Planes:
         plane_tolerance=1e-2,
         fast=True,
     ) -> np.ndarray:
-        import time
-
         # t0 = time.time()
         obj_id = obj.name
         # t1 = time.time()

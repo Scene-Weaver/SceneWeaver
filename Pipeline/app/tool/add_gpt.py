@@ -1,19 +1,13 @@
 import json
 import os
-import random
-import sys
-from typing import Dict
 
-import numpy as np
 from gpt import GPT4
 
 import app.prompt.gpt.add_gpt as prompts1
 import app.prompt.gpt.init_gpt as prompts0
-from app.tool.add_relation import add_relation
-from app.tool.base import BaseTool
 from app.tool.init_gpt import InitGPTExecute
 from app.tool.update_infinigen import update_infinigen
-from app.utils import dict2str, extract_json, lst2str
+from app.utils import extract_json, lst2str
 
 DESCRIPTION = """
 Using GPT to add additional objects into the current scene.
@@ -62,9 +56,9 @@ class AddGPTExecute(InitGPTExecute):
             success = update_infinigen(action, iter, json_name, ideas=ideas)
             assert success
 
-            return f"Successfully add objects with GPT."
-        except Exception as e:
-            return f"Error adding objects with GPT"
+            return "Successfully add objects with GPT."
+        except Exception:
+            return "Error adding objects with GPT"
 
     def add_gpt(self, user_demand, ideas, iter, roomtype):
         json_name = self.generate_scene_iter1_gpt(user_demand, ideas, iter, roomtype)

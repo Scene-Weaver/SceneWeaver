@@ -1,4 +1,3 @@
-import copy
 import math
 
 import open_clip
@@ -7,7 +6,6 @@ import torch.nn.functional as F
 from sentence_transformers import SentenceTransformer
 
 from .objaverse_retriever import ObjathorRetriever
-from .utils import custom_distribution
 
 
 class ObjectRetriever:

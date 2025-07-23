@@ -8,23 +8,9 @@ from collections import OrderedDict
 
 from numpy.random import uniform
 
-from infinigen.assets import static_assets
-from infinigen.assets.objects import (
-    appliances,
-    bathroom,
-    decor,
-    elements,
-    lamp,
-    seating,
-    shelves,
-    table_decorations,
-    tables,
-    tableware,
-    wall_decorations,
-)
 from infinigen.core.constraints import constraint_language as cl
 from infinigen.core.constraints import usage_lookup
-from infinigen.core.tags import Semantics, Subpart
+from infinigen.core.tags import Semantics
 
 from .indoor_asset_semantics import home_asset_usage
 from .util import constraint_util as cu
@@ -152,7 +138,6 @@ def home_constraints():
     storage = wallfurn[Semantics.Storage]
 
     params = sample_home_constraint_params()
-    
 
     # region classroom
 
@@ -238,7 +223,6 @@ def home_constraints():
     # )
     # endregion
 
-    
     # region bookstore
     # rooms = cl.scene()[{Semantics.Room, -Semantics.Object}]
     # obj = cl.scene()[{Semantics.Object, -Semantics.Room}]

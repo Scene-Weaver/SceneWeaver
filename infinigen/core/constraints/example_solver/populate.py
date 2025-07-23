@@ -18,7 +18,6 @@ from infinigen.core.constraints.example_solver.geometry import parse_scene
 from infinigen.core.constraints.example_solver.state_def import State
 from infinigen.core.placement.placement import parse_asset_name
 from infinigen.core.util import blender as butil
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 logger = logging.getLogger(__name__)
 

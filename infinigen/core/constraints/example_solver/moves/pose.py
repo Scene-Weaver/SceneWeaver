@@ -88,11 +88,11 @@ class TranslateMove(moves.Move):
 
         obj_state = state.objs[target_name]
         if "6563700_BookFactory" in target_name:
-            import pdb
+            pass
         # print("111",state.objs["5865980_BookStackFactory"].obj.location)
         # print(target_name,s "1 ",obj_state.obj.location)
         if "3841869_SimpleBookcaseFactory" in target_name:
-            import pdb
+            pass
         parent_planes = apply_relations_surfacesample(
             state,
             target_name,
@@ -257,7 +257,7 @@ class TranslateMove(moves.Move):
         b_names = []
         gradient = np.zeros(3)
         if "SingleCabinet" in name:
-            import pdb
+            pass
         # for _, b in touch.names:
         for i in range(len(touch.names)):
             b = touch.names[i]
@@ -285,7 +285,7 @@ class TranslateMove(moves.Move):
         # if "FloorLampFactory" in name:
         #     a = 1
         if "wardrobe" in name:
-            import pdb
+            pass
         # gradient = centroid_a - centroid_b_mean
         gradient_norm = np.linalg.norm(gradient)
         if len(b_names) == 0 or gradient_norm == 0:
@@ -295,8 +295,6 @@ class TranslateMove(moves.Move):
         # TRANS_MULT = 0.05
         translation = TRANS_MULT * obj_state.dof_matrix_translation @ gradient
         if "SingleCabinet" in name:
-            import pdb
-
             print(state.objs[name].obj.location)
         return translation
 

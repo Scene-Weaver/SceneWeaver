@@ -149,8 +149,6 @@ def execute_tasks(
     dryrun=False,
     optimize_terrain_diskusage=False,
 ):
-    from infinigen_examples.util.visible import invisible_others, visible_others
-
     # invisible_others()
     # bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
     # visible_others()

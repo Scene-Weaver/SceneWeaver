@@ -6,8 +6,6 @@ import argparse
 import logging
 from pathlib import Path
 
-from numpy import deg2rad
-
 # ruff: noqa: E402
 # NOTE: logging config has to be before imports that use logging
 logging.basicConfig(
@@ -16,42 +14,14 @@ logging.basicConfig(
     level=logging.INFO,
 )
 import os
-import pickle
-import sys
 
 import bpy
 import gin
-import numpy as np
 
-from infinigen import repo_root
-from infinigen.assets import lighting
-from infinigen.assets.materials import invisible_to_camera
-from infinigen.assets.objects.wall_decorations.skirting_board import make_skirting_board
-from infinigen.assets.placement.floating_objects import FloatingObjectPlacement
-from infinigen.assets.utils.decorate import read_co
-from infinigen.core import execute_tasks, init, placement, surface, tagging
-from infinigen.core import tags as t
+from infinigen.core import execute_tasks, init
 from infinigen.core.constraints import checks
-from infinigen.core.constraints import constraint_language as cl
-from infinigen.core.constraints import reasoning as r
-from infinigen.core.constraints.example_solver import (
-    Solver,
-    greedy,
-    populate,
-    state_def,
-)
 from infinigen.core.constraints.example_solver.room import constants
-from infinigen.core.constraints.example_solver.room import decorate as room_dec
-from infinigen.core.constraints.example_solver.room.constants import WALL_HEIGHT
-from infinigen.core.placement import camera as cam_util
-from infinigen.core.util import blender as butil
 from infinigen.core.util import pipeline
-from infinigen.core.util.camera import points_inview
-from infinigen.core.util.test_utils import (
-    import_item,
-    load_txt_list,
-)
-from infinigen.terrain import Terrain
 from infinigen_examples.indoor_constraint_examples import home_constraints
 from infinigen_examples.steps import (
     basic_scene,
@@ -60,24 +30,15 @@ from infinigen_examples.steps import (
     evaluate,
     init_graph,
     light,
-    populate_placeholder,
     record,
     room_structure,
-    solve_objects,
-    update_graph,
 )
 from infinigen_examples.util import constraint_util as cu
 from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
-    create_outdoor_backdrop,
-    hide_other_rooms,
-    place_cam_overhead,
     restrict_solving,
 )
 from infinigen_examples.util.visible import (
-    invisible_others,
     invisible_wall,
-    visible_others,
 )
 
 logger = logging.getLogger(__name__)
@@ -124,7 +85,7 @@ def compose_indoors(
             scene_seed, output_folder, overrides, logger, p
         )
         os.environ["ROOM_INFO"] = (
-            f"/home/yandan/workspace/infinigen/roominfo_{method}.json"
+            f"~/workspace/SceneWeaver/roominfo_{method}.json"
         )
         state, solver, override = room_structure.build_room_structure(
             p, overrides, stages, logger, output_folder, scene_seed, consgraph
@@ -302,7 +263,7 @@ if __name__ == "__main__":
         args.json_name = j["json_name"]
 
     with open(
-        f"/home/yandan/workspace/infinigen/roominfo_{args.method}.json", "r"
+        f"run/roominfo_{args.method}.json", "r"
     ) as f:
         j = json.load(f)
         save_dir = j["save_dir"]

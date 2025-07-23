@@ -1,22 +1,10 @@
-from infinigen_examples.indoor_constraint_examples import home_constraints
-from infinigen.core.constraints import constraint_language as cl
-from infinigen_examples.util import constraint_util as cu
-from infinigen.core import tags as t
-from infinigen.core.constraints import checks
-from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
-    create_outdoor_backdrop,
-    hide_other_rooms,
-    place_cam_overhead,
-    restrict_solving,
-)
-from infinigen.terrain import Terrain
-
-from infinigen.core.util import pipeline
-from infinigen.core import execute_tasks, init, placement, surface, tagging
 from infinigen.assets import lighting
+from infinigen.core import surface
+from infinigen.core import tags as t
+from infinigen.core.constraints import constraint_language as cl
 from infinigen.core.constraints import reasoning as r
-
+from infinigen.terrain import Terrain
+from infinigen_examples.util import constraint_util as cu
 
 all_vars = [cu.variable_room, cu.variable_obj]
 
@@ -73,9 +61,8 @@ def default_greedy_stages():
 
     return greedy_stages
 
-def basic_scene(scene_seed,output_folder,overrides,logger,p):
-    
 
+def basic_scene(scene_seed, output_folder, overrides, logger, p):
     logger.debug(overrides)
 
     def add_coarse_terrain():
@@ -95,4 +82,4 @@ def basic_scene(scene_seed,output_folder,overrides,logger,p):
 
     p.run_stage("sky_lighting", lighting.sky_lighting.add_lighting, use_chance=False)
 
-    return p,terrain
+    return p, terrain

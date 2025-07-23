@@ -1,19 +1,16 @@
-
 import json
 import re
 import time
 
 import numpy as np
-import requests
 from gpt import GPT4
-from app.utils import dict2str
 
 
 def eval_scene(iter, user_demand):
     grades, grading = eval_general_score(iter, user_demand)
 
     with open(
-        f"/home/yandan/workspace/infinigen/record_files/metric_{iter}.json", "r"
+        f"~/workspace/SceneWeaver/record_files/metric_{iter}.json", "r"
     ) as f:
         results = json.load(f)
 
@@ -25,7 +22,7 @@ def eval_scene(iter, user_demand):
         "object has collision (less is better)": results["BBL"],
     }
 
-    json_name = f"/home/yandan/workspace/infinigen/Pipeline/record/metric_{iter}.json"
+    json_name = f"~/workspace/SceneWeaver/Pipeline/record/metric_{iter}.json"
     with open(json_name, "w") as f:
         json.dump(metric, f, indent=4)
 
@@ -34,7 +31,7 @@ def eval_scene(iter, user_demand):
 
 def eval_general_score(iter, user_demand):
     # basedir = "/mnt/fillipo/yandan/scenesage/record_scene/manus/well_designed_bedroom_with__realistic_layout/record_scene/"
-    basedir = "/home/yandan/workspace/infinigen/record_scene/"
+    basedir = "~/workspace/SceneWeaver/record_scene/"
     image_path_1 = f"{basedir}/render_{iter}.jpg"
 
     # gpt = GPT4(version="4.1",region="eastus2")
@@ -112,7 +109,9 @@ You are working in a 3D scene environment with the following conventions:
 
 """
 
-    prompt_payload = gpt.get_payload_eval(prompting_text_user=prompting_text_user,render_path=image_path_1)
+    prompt_payload = gpt.get_payload_eval(
+        prompting_text_user=prompting_text_user, render_path=image_path_1
+    )
 
     grades = {"realism": [], "functionality": [], "layout": [], "completion": []}
     for _ in range(1):
@@ -149,33 +148,7 @@ You are working in a 3D scene environment with the following conventions:
 
 
 if __name__ == "__main__":
-    # grades = {
-    #     "realism": {"mean":[],"std":[]},
-    #     "functionality":  {"mean":[],"std":[]},
-    #     "layout": {"mean":[],"std":[]},
-    #     "completion": {"mean":[],"std":[]},
-    #     "OOB":[],
-    #     "BBL":[],
-    #     "Nobj":[]
-    # }
-    # for i in [9,8,7,915]:
-    #     print(f"*** iter {i} ***")
-    #     eval_scene(i,"Design me a bedroom.")
-    #     # eval_scene(i,"A game room for a 6-year-old boy.")
-
-    #     with open(f"record/eval_iter_{i}.json","r") as f:
-    #         j = json.load(f)
-    #     for key,value in j.items():
-    #         grades[key]["mean"].append(value["mean"])
-    #         grades[key]["std"].append(value["std"])
-
-    #     with open(f"/home/yandan/workspace/infinigen/record_files/metric_{i}.json","r") as f:
-    #         j = json.load(f)
-    #     for key,value in j.items():
-    #         grades[key].append(value)
-
-    # with open(f"record/eval_iter_0_{i}.json","w") as f:
-    #     json.dump(grades, f)
+   
     eval_scene(
         11,
         "Design me a classroom.",

@@ -5,17 +5,14 @@ import sys
 import bpy
 from mathutils import Vector
 
-sys.path.append("/home/yandan/workspace/digital-cousins/digital_cousins/models/blend/")
-sys.path.append("/home/yandan/workspace/infinigen")
-import bpy
+sys.path.append("~/workspace/Tabletop-Digital-Cousins/digital_cousins/models/blend/")
+sys.path.append("~/workspace/SceneWeaver")
 import mathutils
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from infinigen.assets.objaverse_assets.place_in_blender import (
-    delete_empty_object,
     delete_object_with_children,
-    get_highest_parent_objects,
     select_meshes_under_empty,
 )
 
@@ -296,12 +293,6 @@ def render_90degree(obj, save_dir):
     return
 
 
-import math
-
-import bpy
-from mathutils import Vector
-
-
 # Calculate the bounding box center and size
 def get_scene_bounds():
     min_coords = Vector((float("inf"), float("inf"), float("inf")))
@@ -453,7 +444,7 @@ if __name__ == "__main__":
     bpy.context.scene.render.resolution_x = 512  # Width in pixels
     bpy.context.scene.render.resolution_y = 512
 
-    # mesh_path = "/home/yandan/.objaverse/hf-objaverse-v1/glbs/000-088/70e32260ba8a4c7aa8f3a230f5fccabd.glb"
+    # mesh_path = "~/.objaverse/hf-objaverse-v1/glbs/000-088/70e32260ba8a4c7aa8f3a230f5fccabd.glb"
     mesh_path = sys.argv[1]
     imported_obj = load_glb(mesh_path)
     print(f"Rendering objaverse assets {mesh_path} 90 degrees ...")

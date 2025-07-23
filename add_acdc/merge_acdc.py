@@ -48,23 +48,12 @@ basic_object = {
 
 def load_infinigen_scene(scene_name):
     blend_file_path = (
-        f"/home/yandan/workspace/infinigen/outputs/indoors/{scene_name}/obj.blend"
+        f"outputs/indoors/{scene_name}/obj.blend"
     )
     bpy.ops.wm.open_mainfile(filepath=blend_file_path)
     bpy.context.view_layer.update()
     return
 
-
-# def load_infinigen_scene(blend_file_path="/home/yandan/workspace/infinigen/outputs/indoors/coarse_p/obj.blend"):
-#     with bpy.data.libraries.load(blend_file_path, link=False) as (data_from, data_to):
-#        data_to.collections = [name for name in data_from.collections]
-
-#     # 将加载的集合添加到当前场景
-#     for collection in data_to.collections:
-#        if collection:
-#            bpy.context.scene.collection.children.link(collection)
-
-#     return
 
 
 def load_acdc_scene(blend_file_path):
@@ -145,7 +134,7 @@ def transform_acdc(
 
 
 def remove_children(target_name, scene_name):
-    json_path = f"/home/yandan/workspace/infinigen/outputs/indoors/{scene_name}/solve_state.json"
+    json_path = f"outputs/indoors/{scene_name}/solve_state.json"
     with open(json_path, "r") as f:
         j = json.load(f)
 
@@ -172,7 +161,7 @@ def remove_children(target_name, scene_name):
     for objname in todelect:
         del j["objs"][objname]
 
-    json_path_new = f"/home/yandan/workspace/infinigen/outputs/indoors/{scene_name}/solve_state_acdc.json"
+    json_path_new = f"outputs/indoors/{scene_name}/solve_state_acdc.json"
     with open(json_path_new, "w") as f:
         json.dump(j, f, indent=4)
 
@@ -180,7 +169,7 @@ def remove_children(target_name, scene_name):
 
 
 def update_solve_state(target_key):
-    json_path_new = f"/home/yandan/workspace/infinigen/outputs/indoors/{scene_name}/solve_state_acdc.json"
+    json_path_new = f"~/outputs/indoors/{scene_name}/solve_state_acdc.json"
     with open(json_path_new, "r") as f:
         j = json.load(f)
 
@@ -205,7 +194,7 @@ def update_solve_state(target_key):
 
 def save_blend_file(scene_name):
     blend_file_path = (
-        f"/home/yandan/workspace/infinigen/outputs/indoors/{scene_name}/scene_new.blend"
+        f"outputs/indoors/{scene_name}/scene_new.blend"
     )
     bpy.ops.wm.save_as_mainfile(filepath=blend_file_path)
 
@@ -217,21 +206,9 @@ if __name__ == "__main__":
     scene_idx = 1
 
     scene_name = "debug_book"
-    acdc_file_path = "/home/yandan/Desktop/acdc_objaverse/acdc_output-desk6/step_3_output/scene_1/scene_1.blend"
+    acdc_file_path = "~/Desktop/acdc_objaverse/acdc_output-desk6/step_3_output/scene_1/scene_1.blend"
     target_name = "SimpleDeskFactory(1487939).spawn_asset(1733853)"
     additional_rot = 0
-
-    # scene_name = "seed1"
-    # acdc_file_path = f"/home/yandan/Desktop/acdc_objaverse/acdc_output-desk5/step_3_output/scene_{scene_idx}/scene_{scene_idx}.blend"
-    # target_name = "SimpleDeskFactory(1445845).spawn_asset(882213)"
-
-    # scene_name = "seed2"
-    # acdc_file_path = f"/home/yandan/Desktop/acdc_objaverse/acdc_output_desk3/step_3_output/scene_{scene_idx}/scene_{scene_idx}.blend"
-    # target_name = "SimpleDeskFactory(3172795).spawn_asset(2960708)"
-
-    # scene_name = "seed3"
-    # acdc_file_path = f"/home/yandan/Desktop/acdc_objaverse/acdc_output-desk111/step_3_output/scene_{scene_idx}/scene_{scene_idx}.blend"
-    # target_name = "SimpleDeskFactory(2888345).spawn_asset(7505598)"
 
     load_infinigen_scene(scene_name)
     load_acdc_scene(acdc_file_path)

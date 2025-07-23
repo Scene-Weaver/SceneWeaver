@@ -1,9 +1,8 @@
-import json
 import os
 import random
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 import cv2
 import faiss
@@ -14,8 +13,6 @@ from PIL import Image
 
 # import torchvision.transforms as T
 # import transforms as T
-from torchvision.ops import box_convert
-
 from .dino_v2 import DinoV2Encoder
 
 

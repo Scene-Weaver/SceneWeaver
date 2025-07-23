@@ -6,8 +6,6 @@ import argparse
 import logging
 from pathlib import Path
 
-from numpy import deg2rad
-
 # ruff: noqa: E402
 # NOTE: logging config has to be before imports that use logging
 logging.basicConfig(
@@ -16,72 +14,32 @@ logging.basicConfig(
     level=logging.INFO,
 )
 import os
-import pickle
 import sys
 
 import bpy
 import gin
-import numpy as np
 
-from infinigen import repo_root
-from infinigen.assets import lighting
-from infinigen.assets.materials import invisible_to_camera
-from infinigen.assets.objects.wall_decorations.skirting_board import make_skirting_board
-from infinigen.assets.placement.floating_objects import FloatingObjectPlacement
-from infinigen.assets.utils.decorate import read_co
-from infinigen.core import execute_tasks, init, placement, surface, tagging
-from infinigen.core import tags as t
+from infinigen.core import execute_tasks, init
 from infinigen.core.constraints import checks
-from infinigen.core.constraints import constraint_language as cl
-from infinigen.core.constraints import reasoning as r
-from infinigen.core.constraints.constraint_language.util import delete_obj_with_children
-from infinigen.core.constraints.example_solver import (
-    Solver,
-    greedy,
-    populate,
-    state_def,
-)
-from infinigen.core.constraints.example_solver.geometry.validity import (
-    all_relations_valid,
-)
 from infinigen.core.constraints.example_solver.room import constants
-from infinigen.core.constraints.example_solver.room import decorate as room_dec
-from infinigen.core.constraints.example_solver.room.constants import WALL_HEIGHT
-from infinigen.core.placement import camera as cam_util
-from infinigen.core.util import blender as butil
 from infinigen.core.util import pipeline
-from infinigen.core.util.camera import points_inview
-from infinigen.core.util.test_utils import (
-    import_item,
-    load_txt_list,
-)
-from infinigen.terrain import Terrain
 from infinigen_examples.indoor_constraint_examples import home_constraints
 from infinigen_examples.steps import (
     basic_scene,
     camera,
     complete_structure,
-    evaluate,
     init_graph,
     light,
-    populate_placeholder,
     record,
     room_structure,
-    solve_objects,
     update_graph,
 )
 from infinigen_examples.util import constraint_util as cu
 from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
-    create_outdoor_backdrop,
-    hide_other_rooms,
-    place_cam_overhead,
     restrict_solving,
 )
 from infinigen_examples.util.visible import (
-    invisible_others,
     invisible_wall,
-    visible_others,
 )
 
 logger = logging.getLogger(__name__)
@@ -223,7 +181,7 @@ def compose_indoors(
             state, solver = update_graph.add_acdc(solver, state, p, description)
         elif action == "add_rule":
             state, solver = update_graph.add_rule(stages, limits, solver, state, p)
-        elif action == "add_obj_crowd":
+        elif action == "add_crowd":
             state, solver = update_graph.add_obj_crowd(solver, state, p)
         elif action == "export_supporter":
             record.export_supporter(
@@ -523,9 +481,6 @@ if __name__ == "__main__":
 
     import json
 
-    # with open("/home/yandan/workspace/infinigen/roominfo.json", "r") as f:
-    #     j = json.load(f)
-    #     save_dir = j["save_dir"]
     save_dir = args.save_dir
     os.environ["save_dir"] = save_dir
 

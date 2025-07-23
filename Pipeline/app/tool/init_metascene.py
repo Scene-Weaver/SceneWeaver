@@ -1,10 +1,6 @@
 import json
-import multiprocessing
 import os
 import random
-import sys
-from io import StringIO
-from typing import Dict
 
 from gpt import GPT4
 
@@ -12,7 +8,7 @@ from app.tool.add_relation import add_relation
 from app.tool.base import BaseTool
 from app.tool.metascene_frontview import get_scene_frontview
 from app.tool.update_infinigen import update_infinigen
-from app.utils import dict2str, extract_json
+from app.utils import dict2str
 
 DESCRIPTION = """
 Load the most related scene from a Real2Sim indoor scene dataset as the basic scene.
@@ -81,7 +77,7 @@ class InitMetaSceneExecute(BaseTool):
                 }
                 json.dump(info, f, indent=4)
             os.system(
-                f"cp {save_dir}/roominfo.json /home/yandan/workspace/infinigen/roominfo.json"
+                f"cp {save_dir}/roominfo.json ../run/roominfo.json"
             )
             success = update_infinigen(action, iter, json_name, ideas=ideas)
             assert success
@@ -94,9 +90,9 @@ class InitMetaSceneExecute(BaseTool):
             )
             assert success
 
-            return f"Successfully initialize scene by loading MetaScene."
-        except Exception as e:
-            return f"Error initializing scene by loading MetaScene."
+            return "Successfully initialize scene by loading MetaScene."
+        except Exception:
+            return "Error initializing scene by loading MetaScene."
 
     def find_metascene(self, user_demand, ideas, roomtype):
         def statistic_obj_nums(scene_id):

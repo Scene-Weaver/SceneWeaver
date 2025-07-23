@@ -7,16 +7,16 @@ def debug():
     fm = FeatureMatcher()
     fm.eval()
 
-    blender_path = "/home/yandan/workspace/infinigen/blender/blender"
-    render_script = "/home/yandan/workspace/infinigen/match/blender_render.py"
+    blender_path = "~/workspace/SceneWeaver/blender/blender"
+    render_script = "~/workspace/SceneWeaver/match/blender_render.py"
     start_angle = 0
     end_angle = 359
 
-    # render_rotation("/home/yandan/Desktop/dift/source.obj",0,360)
+    # render_rotation("~/Desktop/dift/source.obj",0,360)
 
-    input_rgb_path = "/home/yandan/Desktop/dift/ref/standard.png"
-    candidate_imgs_fdirs = "/home/yandan/Desktop/dift/source"
-    topk_model_candidates_dir = "/home/yandan/Desktop/dift/top_k_model_candidates"
+    input_rgb_path = "~/Desktop/dift/ref/standard.png"
+    candidate_imgs_fdirs = "~/Desktop/dift/source"
+    topk_model_candidates_dir = "~/Desktop/dift/top_k_model_candidates"
     name = "laptop"
     # i = 0
 

@@ -21,7 +21,7 @@
 #     from infinigen.assets.objaverse_assets.load_asset import load_pickled_3d_asset
 
 #     obj_names = out[cat]
-#     basedir = "/home/yandan/workspace/Holodeck/data/2023_09_23/assets"
+#     basedir = "~/workspace/Holodeck/data/2023_09_23/assets"
 #     for obj_name in obj_names:
 #         # indir = f"{basedir}/processed_2023_09_23_combine_scale"
 #         filename = f"{basedir}/{obj_name}/{obj_name}.pkl.gz"

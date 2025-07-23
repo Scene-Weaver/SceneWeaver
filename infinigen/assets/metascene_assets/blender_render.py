@@ -5,8 +5,7 @@ import sys
 import bpy
 from mathutils import Vector
 
-sys.path.append("/home/yandan/workspace/digital-cousins/digital_cousins/models/blend/")
-import bpy
+# sys.path.append("~/workspace/Tabletop-Digital-Cousins/digital_cousins/models/blend/") #TODO
 import mathutils
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -25,7 +24,7 @@ def set_origin(imported_obj):
     imported_obj.location.y -= mean_y
 
     pos_bias = [mean_x, mean_y, min_z]
-    bpy.context.scene.cursor.location = [0,0,0]
+    bpy.context.scene.cursor.location = [0, 0, 0]
 
     bpy.ops.object.origin_set(type="ORIGIN_CURSOR", center="BOUNDS")
     return imported_obj, pos_bias
@@ -286,12 +285,6 @@ def render_90degree(obj, save_dir):
     bpy.data.objects.remove(obj, do_unlink=True)
 
     return
-
-
-import math
-
-import bpy
-from mathutils import Vector
 
 
 # Calculate the bounding box center and size

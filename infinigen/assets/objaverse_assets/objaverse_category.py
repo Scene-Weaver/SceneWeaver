@@ -7,7 +7,6 @@
 import json
 import math
 import os
-import random
 
 import bpy
 
@@ -18,9 +17,7 @@ from infinigen.core.tagging import tag_support_surfaces
 from .base import ObjaverseFactory
 from .load_asset import load_pickled_3d_asset
 from .place_in_blender import (
-    delete_empty_object,
     delete_object_with_children,
-    get_highest_parent_objects,
     select_meshes_under_empty,
 )
 

@@ -29,7 +29,6 @@ from infinigen.core.tags import Subpart
 from infinigen.core.util import blender as butil
 
 # import fcl
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 logger = logging.getLogger(__name__)
 

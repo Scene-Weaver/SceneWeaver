@@ -9,10 +9,10 @@
 import copy
 import logging
 from itertools import product
+
 import bpy
 import gin
 import numpy as np
-from infinigen.core.tags import Subpart
 
 from infinigen.core import tags as t
 from infinigen.core.constraints import constraint_language as cl
@@ -20,6 +20,7 @@ from infinigen.core.constraints import reasoning as r
 from infinigen.core.constraints import usage_lookup
 from infinigen.core.constraints.evaluator.domain_contains import objkeys_in_dom
 from infinigen.core.placement.factory import AssetFactory
+from infinigen.core.tags import Subpart
 from infinigen.core.util import blender as butil
 
 from . import moves, propose_relations, state_def
@@ -288,8 +289,6 @@ def propose_addition(
     logger.debug(f"propose_addition found no candidate moves for {bound}")
 
 
-
-
 def propose_deletion(
     cons: cl.Node,
     curr: state_def.State,
@@ -347,6 +346,7 @@ def propose_relation_plane_change(
                     names=[cand], relation_idx=i, plane_idx=plane_idx
                 )
 
+
 # 提出对物体之间关系的“平面”进行更改的提议
 def propose_relation_plane_change_all(
     cons: cl.Node,
@@ -356,19 +356,28 @@ def propose_relation_plane_change_all(
 ):
     cand_objs = []
     for objname in state.objs.keys():
-        if objname.startswith("window") or objname.startswith("entrance") or objname.startswith("newroom_0-0"):
+        if (
+            objname.startswith("window")
+            or objname.startswith("entrance")
+            or objname.startswith("newroom_0-0")
+        ):
             continue
         cand_objs.append(objname)
-
 
     np.random.shuffle(cand_objs)
     for cand in cand_objs:
         for i, rels in enumerate(state.objs[cand].relations):
             if not isinstance(rels.relation, cl.GeometryRelation):
                 continue
-            
-            if Subpart.SupportSurface in rels.relation.parent_tags and rels.target_name!='newroom_0-0' and hasattr(state.objs[rels.target_name],"populate_obj"): #TODO YYD
-                target_obj = bpy.data.objects.get(state.objs[rels.target_name].populate_obj)
+
+            if (
+                Subpart.SupportSurface in rels.relation.parent_tags
+                and rels.target_name != "newroom_0-0"
+                and hasattr(state.objs[rels.target_name], "populate_obj")
+            ):  # TODO YYD
+                target_obj = bpy.data.objects.get(
+                    state.objs[rels.target_name].populate_obj
+                )
             else:
                 target_obj = state.objs[rels.target_name].obj
 
@@ -387,6 +396,7 @@ def propose_relation_plane_change_all(
                 yield moves.RelationPlaneChange(
                     names=[cand], relation_idx=i, plane_idx=plane_idx
                 )
+
 
 def propose_resample(
     cons: cl.Node,

@@ -16,14 +16,13 @@ import mathutils
 import numpy as np
 import trimesh
 from mathutils import Vector
-
 from tqdm import tqdm
 
 from infinigen.core.nodes.node_info import DATATYPE_DIMS, DATATYPE_FIELDS
 
 from . import math as mutil
 from .logging import Suppress
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -67,19 +66,18 @@ class ViewportMode:
             self.orig_active = bpy.context.active_object
             bpy.context.view_layer.objects.active = self.obj
             self.orig_mode = bpy.context.object.mode
-            bpy.ops.object.mode_set.poll() 
+            bpy.ops.object.mode_set.poll()
             bpy.ops.object.mode_set(mode=self.mode)
         except:
             self.orig_active = bpy.context.view_layer.objects.active
             self.orig_mode = self.orig_active.mode
-            self.obj.select_set(True) 
+            self.obj.select_set(True)
 
             with bpy.context.temp_override(object=self.obj):
                 bpy.context.view_layer.objects.active = self.obj
-                self.obj.select_set(True) 
+                self.obj.select_set(True)
                 bpy.ops.object.mode_set(mode=self.mode)
-            # bpy.ops.object.mode_set(mode=self.mode) 
-        
+            # bpy.ops.object.mode_set(mode=self.mode)
 
     def __exit__(self, *args):
         bpy.context.view_layer.objects.active = self.obj
@@ -288,7 +286,6 @@ def select(objs: bpy.types.Object | list[bpy.types.Object]):
         if o.name not in bpy.context.scene.objects:
             raise ValueError(f"Object {o.name=} not in scene and cant be selected")
         o.select_set(True)
-
 
 
 def delete(objs: bpy.types.Object | list[bpy.types.Object]):
@@ -1027,6 +1024,7 @@ def purge_empty_materials(obj):
                 continue
             bpy.context.object.active_material_index = i
             bpy.ops.object.material_slot_remove()
+
 
 def global_polygon_normal(obj, polygon, rev_normal=False):
     loc, rot, scale = obj.matrix_world.decompose()

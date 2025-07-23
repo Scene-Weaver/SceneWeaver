@@ -1,10 +1,6 @@
 import json
 import os
-import random
-import sys
-from typing import Dict
 
-import numpy as np
 from gpt import GPT4
 
 import app.prompt.gpt.init_gpt as prompts
@@ -75,14 +71,14 @@ class InitGPTExecute(BaseTool):
                 }
                 json.dump(info, f, indent=4)
             os.system(
-                f"cp  {save_dir}/roominfo.json /home/yandan/workspace/infinigen/roominfo.json"
+                f"cp  {save_dir}/roominfo.json ../run/roominfo.json"
             )
             success = update_infinigen(action, iter, json_name, ideas=ideas)
             assert success
 
-            return f"Successfully initialize scene with GPT."
-        except Exception as e:
-            return f"Error initializing scene with GPT."
+            return "Successfully initialize scene with GPT."
+        except Exception:
+            return "Error initializing scene with GPT."
 
     def gen_gpt_scene(self, user_demand, ideas, roomtype):
         json_name = self.generate_scene_iter0(user_demand, ideas, roomtype)
@@ -188,7 +184,7 @@ class InitGPTExecute(BaseTool):
         results["Placement_small"] = Placement_small
 
         save_dir = os.getenv("save_dir")
-        json_name = f"{save_dir}/pipeline/init_gpt_results.json"
+        json_name = f"{save_dir}/pipeline/init_gpt_results_{iter}.json"
         with open(json_name, "w") as f:
             json.dump(results, f, indent=4)
 

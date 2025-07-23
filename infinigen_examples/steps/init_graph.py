@@ -1,8 +1,5 @@
 from infinigen.core.constraints.example_solver import (
-    Solver,
     greedy,
-    populate,
-    state_def,
 )
 
 from .basic_scene import all_vars
@@ -61,7 +58,7 @@ def init_holodeck(stages, limits, solver, state, p):
 
 def init_gpt(stages, limits, solver, state, p):
     # region init large physcene
-    def init_graph_gpt():  
+    def init_graph_gpt():
         solver.init_graph_gpt(
             var_assignments=vars,
         )
@@ -73,7 +70,7 @@ def init_gpt(stages, limits, solver, state, p):
         use_chance=False,
         default=state,
     )
-   
+
     return state, solver
 
 

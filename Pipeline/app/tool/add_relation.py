@@ -1,10 +1,6 @@
 import json
 import os
-import random
-import sys
-from typing import Dict
 
-import numpy as np
 from gpt import GPT4
 
 from app.prompt.add_relation import example, system_prompt, user_prompt
@@ -70,9 +66,9 @@ class AddRelationExecute(BaseTool):
                 action, iter, json_name, inplace=False, invisible=True, ideas=ideas
             )
             assert success
-            return f"Successfully add relation between objects."
-        except Exception as e:
-            return f"Error adding relation between objects"
+            return "Successfully add relation between objects."
+        except Exception:
+            return "Error adding relation between objects"
 
 
 def add_relation(user_demand, ideas, iter, roomtype):

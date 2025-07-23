@@ -8,14 +8,12 @@
 
 from __future__ import annotations
 
-import copy
 import logging
 from dataclasses import dataclass
 from typing import Union
 
 import bpy
 import gin
-import mathutils
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -315,6 +313,7 @@ def intersection(src_geoms, tar_geoms, src_names, target_names):
 #     # 返回碰撞结果，包括碰撞状态、涉及的物体名称和接触信息
 #     return ContactResult(hit=hit, names=names, contacts=contacts)
 
+
 def any_touching_expand(
     scene: Scene,
     a: Union[str, list[str]],
@@ -325,10 +324,10 @@ def any_touching_expand(
     # obj_info=None,
 ):  # MAKR
     # if b=='BookStackFactory(970653).spawn_placeholder(5672192)' or a=='BookStackFactory(970653).spawn_placeholder(5672192)':
-    #     mesh1 = scene.geometry['window_mesh'] 
-    #     mesh2 = scene.geometry['newroom_0-0_mesh'] 
-    #     mesh3 = scene.geometry['BookStackFactory(683150).spawn_placeholder(5781023)_mesh'] 
-    #     mesh4 = scene.geometry['MetaCategoryFactory(539113).bbox_placeholder(7256991)_mesh'] 
+    #     mesh1 = scene.geometry['window_mesh']
+    #     mesh2 = scene.geometry['newroom_0-0_mesh']
+    #     mesh3 = scene.geometry['BookStackFactory(683150).spawn_placeholder(5781023)_mesh']
+    #     mesh4 = scene.geometry['MetaCategoryFactory(539113).bbox_placeholder(7256991)_mesh']
     #     mesh5 = scene.geometry['BookStackFactory(970653).spawn_placeholder(5672192)_mesh']
     #     scene1 = trimesh.Scene([mesh1,mesh2,mesh3,mesh4,mesh5])
     #     scene1.show()
@@ -428,7 +427,7 @@ def any_touching(
 
     In all cases, returns True if any one object from a and b touch
     """
-    
+
     # 预处理输入，确保 a、b 和标签的格式一致
     a, b, a_tags, b_tags = preprocess_collision_query_cases(a, b, a_tags, b_tags)
     # 从场景中获取与 a 相关的碰撞检测对象

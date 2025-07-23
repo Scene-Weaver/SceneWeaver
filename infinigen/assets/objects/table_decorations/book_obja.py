@@ -21,7 +21,7 @@ from infinigen.assets.material_assignments import AssetList
 from infinigen.assets.materials import text
 from infinigen.assets.utils.decorate import read_co, write_attribute, write_co
 from infinigen.assets.utils.mesh import longest_ray
-from infinigen.assets.utils.object import center, join_objects, new_bbox, new_cube
+from infinigen.assets.utils.object import join_objects, new_bbox, new_cube
 from infinigen.assets.utils.uv import wrap_front_back_side
 from infinigen.core.placement.factory import AssetFactory
 from infinigen.core.util import blender as butil

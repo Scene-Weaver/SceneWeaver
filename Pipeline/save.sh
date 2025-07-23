@@ -5,7 +5,7 @@ mkdir ${p}
 cd ${p}
 
 
-cp -r ~/workspace/infinigen/record_scene/ .
-cp -r ~/workspace/infinigen/record_files/ .
-cp -r ~/workspace/infinigen/Pipeline/record/ 
-cp -r ~/workspace/infinigen/args*.json .
+cp -r ~/workspace/SceneWeaver/record_scene/ .
+cp -r ~/workspace/SceneWeaver/record_files/ .
+cp -r ~/workspace/SceneWeaver/Pipeline/record/ 
+cp -r ~/workspace/SceneWeaver/args*.json .

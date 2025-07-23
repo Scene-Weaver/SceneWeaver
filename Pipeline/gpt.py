@@ -1,6 +1,6 @@
 import base64
 
-from TongGPT import GPT4V, GPT4o, TongGPT
+from TongGPT import GPT4o
 
 
 class GPT4(GPT4o):
@@ -229,7 +229,7 @@ class GPT4(GPT4o):
         #                       "Example output: bedroom, 0.9"
 
         prompt_text_system = (
-            f"You are given a description of objects in a room or multiple rooms.\n"
+            "You are given a description of objects in a room or multiple rooms.\n"
             + "Based on the list of objects and their quantities, predict the room type(s) and the confidence score(s) between 0 and 1, where 1 means very high confidence in the prediction.\n"
             + "The description includes the object categories and their counts.\n"
             + "The room type(s) can be things like 'living room,' 'kitchen,' 'bedroom,' 'office,' etc.\n"
@@ -272,7 +272,7 @@ class GPT4(GPT4o):
         # Getting the base64 string
 
         prompt_text_system = (
-            f"You are given a json of objects with their quantities in a room. Your task is to:\n"
+            "You are given a json of objects with their quantities in a room. Your task is to:\n"
             + "1. Merge similar categories (e.g., 'books' and 'book' should be merged into 'books').\n"
             + "2. Simplify category names (e.g., 'a blue bottle' should become 'bottle' and 'a white hotel information booklet' should be 'booklet').\n"
             + "3. Convert plural forms to singular (e.g., 'books' should be converted to 'book').\n"

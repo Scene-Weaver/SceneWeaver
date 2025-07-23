@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 import torchvision
 from torchvision.transforms import InterpolationMode, Normalize, Resize

@@ -1,5 +1,4 @@
-
-from gpt import GPT4 
+from gpt import GPT4
 
 system_prompt = """
 I want to design a scene according to the user's demand. 
@@ -38,17 +37,18 @@ Current room size: {roomsize}
 Your response:
 """
 
-def get_roomsize(user_demand,ideas,roomsize,roomtype):
-    
-    user_prompt_1 = user_prompt.format(user_demand=user_demand,roomtype=roomtype,ideas=ideas,roomsize=roomsize) 
-        
-    gpt = GPT4(version='4.1')
+
+def get_roomsize(user_demand, ideas, roomsize, roomtype):
+    user_prompt_1 = user_prompt.format(
+        user_demand=user_demand, roomtype=roomtype, ideas=ideas, roomsize=roomsize
+    )
+
+    gpt = GPT4(version="4.1")
 
     prompt_payload = gpt.get_payload(system_prompt, user_prompt_1)
     gpt_text_response = gpt(payload=prompt_payload, verbose=True)
     print(gpt_text_response)
     roomsize = gpt_text_response.split(",")
-    roomsize = [round(float(roomsize[0]),1),round(float(roomsize[1]),1)]
+    roomsize = [round(float(roomsize[0]), 1), round(float(roomsize[1]), 1)]
 
     return roomsize
-    

@@ -1,19 +1,14 @@
-import sys
-from typing import Dict
-
-from app.tool.base import BaseTool
 import json
 import os
-import random
-import numpy as np
-from gpt import GPT4 
-from app.utils import extract_json, dict2str, lst2str
-import json
 
+from gpt import GPT4
+
+from app.prompt.gpt.remove_obj import example, system_prompt, user_prompt
+from app.tool.base import BaseTool
 from app.tool.update_infinigen import update_infinigen
-from app.prompt.gpt.remove_obj import system_prompt,user_prompt,example
+from app.utils import dict2str, extract_json, lst2str
 
-DESCRIPTION="""
+DESCRIPTION = """
 Remove objects with GPT. Works with all room types.
 
 Use Case 1: Remove redundant and unnecessary objects when the scene is crowded or when there are too many objects. (e.g., eliminate a table in the corner)
@@ -27,7 +22,6 @@ Weaknesses: Can not add objects or replace objects. You must use this method car
 
 
 class RemoveExecute(BaseTool):
-    
     name: str = "remove_object"
     description: str = DESCRIPTION
     parameters: dict = {
@@ -47,22 +41,20 @@ class RemoveExecute(BaseTool):
         roomtype = os.getenv("roomtype")
         action = self.name
         try:
-            #find scene
+            # find scene
             json_name = self.update_scene_gpt(user_demand, ideas, iter, roomtype)
             # json_name = update_ds(user_demand,ideas,iter,roomtype)
 
-            success = update_infinigen("remove_object", iter, json_name,ideas=ideas)
+            success = update_infinigen("remove_object", iter, json_name, ideas=ideas)
             assert success
-            return f"Successfully remove object with GPT."
-        except Exception as e:
-            return f"Error remove object with GPT"
+            return "Successfully remove object with GPT."
+        except Exception:
+            return "Error remove object with GPT"
 
     def update_scene_gpt(self, user_demand, ideas, iter, roomtype):
         save_dir = os.getenv("save_dir")
         render_path = f"{save_dir}/record_scene/render_{iter-1}.jpg"
-        with open(
-            f"{save_dir}/record_scene/layout_{iter-1}.json", "r"
-        ) as f:
+        with open(f"{save_dir}/record_scene/layout_{iter-1}.json", "r") as f:
             layout = json.load(f)
 
         roomsize = layout["roomsize"]
@@ -79,7 +71,7 @@ class RemoveExecute(BaseTool):
             structure=structure,
             user_demand=user_demand,
             ideas=ideas,
-            example=example
+            example=example,
         )
 
         gpt = GPT4(version="4.1")

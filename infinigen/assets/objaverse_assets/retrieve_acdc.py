@@ -5,7 +5,6 @@ import multiprocessing
 import os
 import re
 import shutil
-import subprocess
 import sys
 import threading
 
@@ -31,7 +30,7 @@ meta = json.load(
             "objaverse_meta.json",
             token=True,
             repo_type="dataset",
-            local_dir="/home/yandan/workspace/IDesign/OpenShape-Embeddings",
+            local_dir="~/workspace/IDesign/OpenShape-Embeddings",
         )
     )
 )
@@ -43,7 +42,7 @@ deser = torch.load(
         "objaverse.pt",
         token=True,
         repo_type="dataset",
-        local_dir="/home/yandan/workspace/IDesign/OpenShape-Embeddings",
+        local_dir="~/workspace/IDesign/OpenShape-Embeddings",
     ),
     map_location="cpu",
 )
@@ -122,9 +121,7 @@ def preprocess(input_string):
 
 
 if __name__ == "__main__":
-    # with open("/home/yandan/workspace/infinigen/roominfo.json","r") as f:
-    #     j = json.load(f)
-    #     roomtype = j["roomtype"]
+    
     save_dir = sys.argv[1]
 
     # if not os.path.exists(f"{save_dir}/objav_files.json"):
@@ -144,7 +141,7 @@ if __name__ == "__main__":
                     a = 1
                 if category.lower() == "car":
                     LoadObjavFiles["car"] = [
-                        "/home/yandan/.objaverse/hf-objaverse-v1/glbs/000-068/45840e2136c44080b4c1e7521cce8db3.glb"
+                        "~/.objaverse/hf-objaverse-v1/glbs/000-068/45840e2136c44080b4c1e7521cce8db3.glb"
                     ]
                     continue
                 # text = preprocess(f"A high-poly {roomtype} {category} in high quality")

@@ -4,7 +4,6 @@
 # Authors: Zeyu Ma
 
 import itertools
-import pdb
 
 import mathutils
 import networkx as nx

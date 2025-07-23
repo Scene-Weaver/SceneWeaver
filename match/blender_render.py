@@ -39,21 +39,7 @@ def add_light():
     return
 
 
-# Example of calling the function with a scene file
 
-
-# #standard
-# obj = bpy.data.objects.get("standard")
-# obj.rotation_euler = (0,0,0)
-# obj.location = (0,0,0)
-# bpy.context.view_layer.update()
-# # Render the image
-# bpy.context.scene.render.filepath = f"/home/yandan/Desktop/dift/standard.png"  # Change the filepath as needed
-# bpy.context.scene.render.image_settings.file_format = 'PNG'  # Set the desired image format
-# bpy.ops.render.render(write_still=True)
-# #move away
-# obj.location = (10,10,10)
-# bpy.context.view_layer.update()
 
 
 def new_angle_range(top_k_angles):
@@ -70,7 +56,7 @@ def new_angle_range(top_k_angles):
 
 
 def render_rotation(mesh_path, start_angle, end_angle):
-    save_dir = "/home/yandan/Desktop/dift/source"
+    save_dir = "~/Desktop/dift/source"
 
     os.system(f"rm {save_dir}/*")
     scene = bpy.context.scene
@@ -127,4 +113,4 @@ if __name__ == "__main__":
     start_angle = int(sys.argv[-2])
     end_angle = int(sys.argv[-1])
 
-    render_rotation("/home/yandan/Desktop/dift/source.obj", start_angle, end_angle)
+    render_rotation("~/Desktop/dift/source.obj", start_angle, end_angle)

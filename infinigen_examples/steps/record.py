@@ -2,19 +2,24 @@ import os
 
 import bpy
 
-from infinigen.core import tagging
-from infinigen.core import tags as t
 from infinigen.core.constraints.example_solver import (
-    Solver,
-    greedy,
     populate,
-    state_def,
 )
 
 from .tools import export_layout, load_record, render_scene, save_record
 
 
-def record_scene(state, solver, terrain, house_bbox, solved_bbox, camera_rigs, iter, p, transparent=False):
+def record_scene(
+    state,
+    solver,
+    terrain,
+    house_bbox,
+    solved_bbox,
+    camera_rigs,
+    iter,
+    p,
+    transparent=False,
+):
     save_dir = os.getenv("save_dir")
     export_layout(state, solver, f"{save_dir}/record_scene/layout_{iter}.json")
     p.run_stage(
@@ -23,8 +28,7 @@ def record_scene(state, solver, terrain, house_bbox, solved_bbox, camera_rigs, i
         state,
         # final=True,
         use_chance=False,
-    )   
-   
+    )
 
     save_record(state, solver, terrain, house_bbox, solved_bbox, iter, p)
     save_dir = os.getenv("save_dir")
@@ -39,7 +43,7 @@ def record_scene(state, solver, terrain, house_bbox, solved_bbox, camera_rigs, i
         state,
         solver,
         filename=filename,
-        transparent=transparent
+        transparent=transparent,
     )
 
     return
@@ -77,7 +81,7 @@ def export_supporter(state, obj_name, export_path):
             # Save only the remaining object
             bpy.ops.wm.save_as_mainfile(filepath=export_path)
 
-            candidate = "/home/yandan/workspace/infinigen/record_files/obj.blend"
+            candidate = "~/workspace/SceneWeaver/record_files/obj.blend"
             bpy.ops.wm.save_as_mainfile(
                 filepath=candidate, check_existing=False, compress=False, copy=True
             )

@@ -1,8 +1,5 @@
 from infinigen.core.constraints.example_solver import (
-    Solver,
     greedy,
-    populate,
-    state_def,
 )
 
 from .basic_scene import all_vars
@@ -37,13 +34,13 @@ def add_gpt(stages, limits, solver, state, p):
     return state, solver
 
 
-def modify(solver, state, p):
-    def modify_graph():
-        solver.modify_graph()
-        return solver.state
+# def modify(solver, state, p):
+#     def modify_graph():
+#         solver.modify_graph()
+#         return solver.state
 
-    state = p.run_stage("modify_graph", modify_graph, use_chance=False, default=state)
-    return state
+#     state = p.run_stage("modify_graph", modify_graph, use_chance=False, default=state)
+#     return state
 
 
 def remove_object(solver, state, p):

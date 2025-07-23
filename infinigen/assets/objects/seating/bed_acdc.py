@@ -2,23 +2,12 @@
 # This source code is licensed under the BSD 3-Clause license found in the LICENSE file in the root directory of this source tree.
 
 # Authors: Lingjie Mei
-import random
-from functools import cached_property
 
 import bpy
 import numpy as np
-import trimesh
-from numpy.random import uniform
 
 import GPT
-from infinigen.assets.objects.seating import bedframe, mattress, pillow
-from infinigen.assets.scatters import clothes
-from infinigen.assets.utils.decorate import decimate, read_co, subsurf
-from infinigen.assets.utils.object import obj2trimesh
-from infinigen.core.util import blender as butil
-from infinigen.core.util.blender import deep_clone_obj
-from infinigen.core.util.random import log_uniform
-from infinigen.core.util.random import random_general as rg
+from infinigen.assets.objects.seating import bedframe
 
 
 class BedFactory(bedframe.BedFrameFactory):
@@ -48,8 +37,8 @@ class BedFactory(bedframe.BedFrameFactory):
         #     except:
         #         continue
 
-        # mesh_path = "/home/yandan/dataset/3D-scene/3D-FUTURE-model/401aa29f-6dbe-41f6-b91d-9c7bf5af9dd8/raw_model.obj "
-        mesh_path = "/home/yandan/Desktop/bed1.obj"
+        # mesh_path = "~/dataset/3D-scene/3D-FUTURE-model/401aa29f-6dbe-41f6-b91d-9c7bf5af9dd8/raw_model.obj "
+        mesh_path = "~/Desktop/bed1.obj"
         _ = bpy.ops.wm.obj_import(filepath=mesh_path)
         obj = bpy.context.selected_objects[0]
         scale = np.array(

@@ -53,7 +53,9 @@ if __name__ == "__main__":
         args.iter = j["iter"]
         args.inplace = j["inplace"]
     
-    with open("/home/yandan/workspace/infinigen/roominfo_record.json","r") as f:
+    import os
+    current_file_path = os.path.abspath(__file__)
+    with open(f"{current_file_path}/../run/roominfo_record.json","r") as f:
         j = json.load(f)
         save_dir = j["save_dir"]
         

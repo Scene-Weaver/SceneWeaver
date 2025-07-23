@@ -26,7 +26,6 @@ from infinigen.core.constraints.example_solver.geometry import (
 from infinigen.core.constraints.example_solver.state_def import ObjectState, State
 from infinigen.core.placement.factory import AssetFactory
 from infinigen.core.util import blender as butil
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 from . import moves
 from .reassignment import pose_backup, restore_pose_backup
@@ -135,24 +134,11 @@ class Addition(moves.Move):
 
         state.objs[target_name] = objstate
 
-        # if target_name == "113239_OfficeChairFactory":
-        #     a = 1
-        # if target_name != "113239_OfficeChairFactory" and  "OfficeChairFactory" in target_name:
-        #     a = 1
-        #     bpy.ops.wm.save_as_mainfile(filepath="/home/yandan/Desktop/a.blend")
 
         success = dof.try_apply_relation_constraints(
             state, target_name, expand_collision=expand_collision
         )  # check
-        # if success:
-        #     if (
-        #         "LargeShelfFactory(1502912).bbox_placeholder(2697479)"
-        #         in objstate.obj.name
-        #     ):
-        #         import pdb
 
-        #         pdb.set_trace()
-        #     a = 1
         logger.debug(f"{self} {success=}")
         return success
 
@@ -214,7 +200,6 @@ class Addition(moves.Move):
         expand_collision=False,
     ):  # mark
         assert target_name not in state.objs
-        import copy
 
         if "keyboard" in target_name:
             a = 1

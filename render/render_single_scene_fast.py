@@ -379,5 +379,5 @@ if __name__ == "__main__":
     # print("Current render engine:", bpy.context.scene.render.engine)
     rotate_scene(anchor, angle=0)
 
-    # ~/software/blender-4.2.0-linux-x64$ ./blender --background --python /home/yandan/workspace/infinigen/render/render_scene.py
-    # /home/yandan/software/blender-4.2.0-linux-x64/blender /mnt/fillipo/yandan/scenesage/record_scene/holodeck//waitingroom/waitingroom_0/record_files/scene_0.blend --background --python /home/yandan/workspace/infinigen/render/render_scene.py
+    # ~/software/blender-4.2.0-linux-x64$ ./blender --background --python ~/workspace/infinigen/render/render_scene.py
+    # ~/software/blender-4.2.0-linux-x64/blender /mnt/fillipo/yandan/scenesage/record_scene/holodeck//waitingroom/waitingroom_0/record_files/scene_0.blend --background --python ~/workspace/infinigen/render/render_scene.py

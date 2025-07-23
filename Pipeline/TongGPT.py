@@ -10,7 +10,7 @@ class TongGPT:
         API_BASE = "https://api.tonggpt.mybigai.ac.cn/proxy"
         self.ENDPOINT = f"{API_BASE}/{self.REGION}"
         self.MODEL = MODEL
-        with open("/home/yandan/workspace/key.txt","r") as f:
+        with open("key.txt","r") as f:
             lines = f.readlines()
         self.API_KEY = lines[0].strip()
         self.api_version = "2025-03-01-preview" #"2024-02-01"

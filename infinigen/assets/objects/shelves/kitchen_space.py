@@ -4,7 +4,6 @@
 # Authors: Yiming Zuo, Stamatis Alexandropoulos
 
 import bpy
-import numpy as np
 from mathutils import Vector
 from numpy.random import choice, uniform
 

@@ -5,6 +5,7 @@
 
 
 import bpy
+
 from infinigen.core.placement.factory import AssetFactory
 
 

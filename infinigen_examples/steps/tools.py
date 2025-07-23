@@ -6,31 +6,23 @@ import types
 import bpy
 import dill
 import mathutils
-import trimesh
-import trimesh.parent
 
 from infinigen.assets.materials import invisible_to_camera
-from infinigen.core import execute_tasks, init, placement, surface, tagging
+from infinigen.core import tagging
 from infinigen.core import tags as t
 from infinigen.core.constraints.example_solver.room import decorate as room_dec
 from infinigen.core.util import blender as butil
 from infinigen_examples.steps.draw_bbox import (
-    add_rotated_bbox_wireframe,
     get_arrow,
     get_bbox,
     get_coord,
 )
 from infinigen_examples.util import constraint_util as cu
 from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
-    create_outdoor_backdrop,
-    hide_other_rooms,
     place_cam_overhead,
-    restrict_solving,
 )
 from infinigen_examples.util.visible import (
     invisible_others,
-    visible_layer,
     visible_layers,
     visible_others,
 )
@@ -461,8 +453,6 @@ def merge_two_image(background_imgfile, foregroung_imgfile, transparent=False):
 
 
 def world_to_image(image_path, output_path):
-    import os
-
     import bpy_extras
     from mathutils import Vector
     from PIL import Image, ImageDraw, ImageFont

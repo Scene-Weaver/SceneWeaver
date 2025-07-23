@@ -98,7 +98,7 @@ def visible_layer(collection_name):
         layer_collection.exclude = False
         layer_collection.hide_viewport = False
     else:
-        print(f"   - Error: collection not found in view_layer")
+        print("   - Error: collection not found in view_layer")
 
 
 def visible_others(view_all=False):

@@ -4,7 +4,6 @@ import re
 import time
 
 import numpy as np
-import requests
 from app.utils import dict2str
 from gpt import GPT4
 
@@ -244,23 +243,25 @@ You are working in a 3D scene environment with the following conventions:
 
 
 if __name__ == "__main__":
-    # roomtype = "bathroom"
-    for roomtype in ["kitchen"]:
-        # for i in range(10):
-        #     save_dir = f"/mnt/fillipo/yandan/scenesage/record_scene/manus/Design_me_a_{roomtype}_{i}"
-        #     img_dir = f"{save_dir}/record_scene"
-        #     max_iter = 0
-        #     for file in os.listdir(img_dir):
-        #         if file.endswith(".jpg") and len(file.split("_"))==2:
-        #             iter = int(file.split("_")[1].split(".")[0])
-        #             max_iter = max(max_iter,iter)
-        #     os.environ["save_dir"] = save_dir
-        #     print(f"evaluating ours Design_me_a_{roomtype}_{i} in iter {max_iter}")
+    roomtypes = ["kitchen"]
+    for roomtype in roomtypes:
+        save_dirs = []
+        for i in range(10):
+            save_dir = f"/mnt/fillipo/yandan/scenesage/record_scene/manus/Design_me_a_{roomtype}_{i}"
+            save_dirs.append(save_dir)
+            img_dir = f"{save_dir}/record_scene"
+            max_iter = 0
+            for file in os.listdir(img_dir):
+                if file.endswith(".jpg") and len(file.split("_")) == 2:
+                    iter = int(file.split("_")[1].split(".")[0])
+                    max_iter = max(max_iter, iter)
+            os.environ["save_dir"] = save_dir
+            print(f"evaluating ours Design_me_a_{roomtype}_{i} in iter {max_iter}")
 
-        #     eval_scene(
-        #         max_iter,
-        #         f"Design me a {roomtype}.",
-        #     )
+            eval_scene(
+                max_iter,
+                f"Design me a {roomtype}.",
+            )
 
         score = {
             "gpt_real": [],
@@ -272,14 +273,12 @@ if __name__ == "__main__":
             "BBL": [],
         }
 
-        # for i in [10,12,14,15,16,17,19]:
-        basedir = (
-            f"/mnt/fillipo/yandan/scenesage/record_scene/manus/0_{roomtype}_nophy/"
-        )
-        for file in os.listdir(basedir):
-            # for i in range(10):
-
-            save_dir = f"{basedir}/{file}"
+        # basedir = (
+        #     f"/mnt/fillipo/yandan/scenesage/record_scene/manus/"
+        # )
+        # for file in os.listdir(basedir):
+        for save_dir in save_dirs:
+            # save_dir = f"{basedir}/{file}"
             img_dir = f"{save_dir}/record_scene"
             max_iter = 0
             for file in os.listdir(img_dir):
@@ -311,5 +310,4 @@ if __name__ == "__main__":
         for key, value in score.items():
             score_mean[key] = round(np.mean(value), 3)
 
-        # print(score_mean)
         print("ours", roomtype, list(score_mean.values()))

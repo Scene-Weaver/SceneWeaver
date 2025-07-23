@@ -1,17 +1,12 @@
 import json
 import os
-import random
-import sys
-from typing import Dict
 
-import numpy as np
 from gpt import GPT4
 
 from app.prompt.acdc_cand import system_prompt, user_prompt
-from app.tool.add_relation import add_relation
 from app.tool.base import BaseTool
 from app.tool.update_infinigen import update_infinigen
-from app.utils import dict2str, extract_json, lst2str
+from app.utils import extract_json
 
 DESCRIPTION = """
 Using image generation and 3D reconstruction to add additional objects into the current scene.
@@ -78,7 +73,7 @@ class AddAcdcExecute(BaseTool):
                         _ = acdc(img_filename, obj_id, info["obj category"])
 
                         with open(
-                            "/home/yandan/workspace/digital-cousins/args.json", "r"
+                            "~/workspace/digital-cousins/args.json", "r"
                         ) as f:
                             j = json.load(f)
                             if j["success"]:
@@ -104,9 +99,9 @@ class AddAcdcExecute(BaseTool):
                 )
                 inplace = True
 
-            return f"Successfully add objects with ACDC."
-        except Exception as e:
-            return f"Error adding objects with ACDC"
+            return "Successfully add objects with ACDC."
+        except Exception:
+            return "Error adding objects with ACDC"
 
 
 def acdc(img_filename, obj_id, category):
@@ -119,20 +114,20 @@ def acdc(img_filename, obj_id, category):
         "success": False,
         "error": "Unknown",
     }
-    with open("/home/yandan/workspace/digital-cousins/args.json", "w") as f:
+    with open("~/workspace/Tabletop-Digital-Cousins/args.json", "w") as f:
         json.dump(j, f, indent=4)
 
     import subprocess
 
     cmd = """
-    source ~/anaconda3/etc/profile.d/conda.sh
+    source /home/yandan/anaconda3/etc/profile.d/conda.sh
     conda deactivate
-    cd /home/yandan/workspace/digital-cousins
+    cd ~/workspace/Tabletop-Digital-Cousins
     conda activate acdc2
-    python digital_cousins/pipeline/acdc_pipeline.py --gpt_api_key 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 > /home/yandan/workspace/infinigen/Pipeline/run.log 2>&1
+    python digital_cousins/pipeline/acdc_pipeline.py --gpt_api_key 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 > ~/workspace/SceneWeaver/Pipeline/run.log 2>&1
     """
     subprocess.run(["bash", "-c", cmd])
-    # os.system("bash -i /home/yandan/workspace/digital-cousins/run.sh")
+    # os.system("bash -i ~/workspace/digital-cousins/run.sh")
     save_dir = os.getenv("save_dir")
     json_name = (
         f"{save_dir}/pipeline/acdc_output/step_3_output/scene_0/scene_0_info.json"
@@ -148,10 +143,10 @@ def gen_img_SD(SD_prompt, obj_id, obj_size):
     save_dir = os.getenv("save_dir")
     img_filename = f"{save_dir}/pipeline/SD_img.jpg"
     j = {"prompt": SD_prompt, "img_savedir": img_filename}
-    with open("/home/yandan/workspace/sd3.5/prompt.json", "w") as f:
+    with open("~/workspace/sd3.5/prompt.json", "w") as f:
         json.dump(j, f, indent=4)
 
-    basedir = "/home/yandan/workspace/sd3.5"
+    basedir = "~/workspace/sd3.5"
     os.system(f"bash {basedir}/run.sh")
 
     return img_filename

@@ -66,7 +66,7 @@ class BookFactory(AssetFactory):
         # from infinigen.tools.export import bake_object,bake_metal
         # from pathlib import Path
 
-        # bake_object(obj,Path("/home/yandan/workspace/infinigen/debug"),1024,"usdc")
+        # bake_object(obj,Path("~/workspace/SceneWeaver/debug"),1024,"usdc")
 
         return obj
 

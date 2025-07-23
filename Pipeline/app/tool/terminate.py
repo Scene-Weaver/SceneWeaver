@@ -1,5 +1,6 @@
-from app.tool.base import BaseTool
 import os
+
+from app.tool.base import BaseTool
 from app.tool.update_infinigen import update_infinigen
 
 _TERMINATE_DESCRIPTION = """Terminate the scene synthesis when the request is met OR if the assistant cannot proceed further with the task.
@@ -27,6 +28,6 @@ class Terminate(BaseTool):
         try:
             success = update_infinigen("finalize_scene", iter, "")
             assert success
-            return f"Successfully terminate."
-        except Exception as e:
-            return f"Error terminate"
+            return "Successfully terminate."
+        except Exception:
+            return "Error terminate"

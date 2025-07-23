@@ -6,8 +6,6 @@ import argparse
 import logging
 from pathlib import Path
 
-from numpy import deg2rad
-
 # ruff: noqa: E402
 # NOTE: logging config has to be before imports that use logging
 logging.basicConfig(
@@ -16,50 +14,12 @@ logging.basicConfig(
     level=logging.INFO,
 )
 import os
-import bpy
-import gin
-import numpy as np
 
-from infinigen import repo_root
-from infinigen.assets import lighting
-from infinigen.assets.materials import invisible_to_camera
-from infinigen.assets.objects.wall_decorations.skirting_board import make_skirting_board
-from infinigen.assets.placement.floating_objects import FloatingObjectPlacement
-from infinigen.assets.utils.decorate import read_co
-from infinigen.core import execute_tasks, init, placement, surface, tagging
-from infinigen.core import tags as t
-from infinigen.core.constraints import checks
-from infinigen.core.constraints import constraint_language as cl
-from infinigen.core.constraints import reasoning as r
-from infinigen.core.constraints.example_solver import (
-    Solver,
-    greedy,
-    populate,
-    state_def,
-)
+import gin
+
+from infinigen.core import execute_tasks, init
 from infinigen.core.constraints.example_solver.room import constants
-from infinigen.core.constraints.example_solver.room import decorate as room_dec
-from infinigen.core.constraints.example_solver.room.constants import WALL_HEIGHT
-from infinigen.core.placement import camera as cam_util
-from infinigen.core.util import blender as butil
-from infinigen.core.util import pipeline
-from infinigen.core.util.camera import points_inview
-from infinigen.core.util.test_utils import (
-    import_item,
-    load_txt_list,
-)
-from infinigen.terrain import Terrain
-from infinigen_examples.indoor_constraint_examples import home_constraints
 from infinigen_examples.util import constraint_util as cu
-from infinigen_examples.util.generate_indoors_util import (
-    apply_greedy_restriction,
-    create_outdoor_backdrop,
-    hide_other_rooms,
-    place_cam_overhead,
-    restrict_solving,
-)
-from infinigen_examples.util.visible import invisible_others, visible_others
-import pickle
 
 # from . import generate_nature  # noqa F401 # needed for nature gin configs to load
 
@@ -67,54 +27,82 @@ logger = logging.getLogger(__name__)
 
 all_vars = [cu.variable_room, cu.variable_obj]
 
+
 @gin.configurable
 def compose_indoors(output_folder: Path, scene_seed: int, **overrides):
     from .steps import (
         basic_scene,
-        room_structure, 
-        init_graph, 
-        solve_objects, 
         camera,
-        populate_placeholder,
+        complete_structure,
+        init_graph,
         light,
-        update_graph,
+        populate_placeholder,
         record,
-        complete_structure
+        room_structure,
+        solve_objects,
+        update_graph,
     )
-    
-    p,stages,consgraph,limits,terrain = basic_scene.basic_scene(scene_seed,output_folder,overrides,logger)
-    
-    os.environ["GPT_RESULTS"] = "/home/yandan/workspace/infinigen/GPT/results_classroom_gpt_turbo.json"
-    state,solver,override = room_structure.build_room_structure(p,overrides,stages,logger,output_folder,scene_seed,consgraph)
-    
-    state,solver = init_graph.init_physcene(stages,limits,solver,state,p)
+
+    p, stages, consgraph, limits, terrain = basic_scene.basic_scene(
+        scene_seed, output_folder, overrides, logger
+    )
+
+    os.environ["GPT_RESULTS"] = (
+        "GPT/results_classroom_gpt_turbo.json"
+    )
+    state, solver, override = room_structure.build_room_structure(
+        p, overrides, stages, logger, output_folder, scene_seed, consgraph
+    )
+
+    state, solver = init_graph.init_physcene(stages, limits, solver, state, p)
     # state,solver = init_graph.init_gpt(stages,limits,solver,state,p)
     # state,solver = init_graph.init_metascene(stages,limits,solver,state,p)
-    
-    state,solver = solve_objects.solve_large_object(stages,limits,solver,state,p,consgraph,overrides)
-    camera_rigs,solved_rooms,house_bbox,solved_bbox = camera.animate_camera(state,stages,limits,solver,p)
-    
+
+    state, solver = solve_objects.solve_large_object(
+        stages, limits, solver, state, p, consgraph, overrides
+    )
+    camera_rigs, solved_rooms, house_bbox, solved_bbox = camera.animate_camera(
+        state, stages, limits, solver, p
+    )
+
     # populate_placeholder.populate_intermediate_pholders(p,solver)
     light.turn_off(p)
 
-    state,solver = update_graph.add_gpt(stages,limits,solver,p)
-    record.record_scene(state,solver,solved_bbox,camera_rigs,p)
+    state, solver = update_graph.add_gpt(stages, limits, solver, p)
+    record.record_scene(state, solver, solved_bbox, camera_rigs, p)
 
-    state,solver = solve_objects.solve_medium_object(stages,limits,solver,state,p,consgraph,overrides)
-    state,solver = update_graph.modify(stages,limits,solver,p)
-    state,solver = update_graph.update(stages,limits,solver,p)
-    
-    state,solver = solve_objects.solve_large_and_medium_object(stages,limits,solver,state,p,consgraph,overrides)
+    state, solver = solve_objects.solve_medium_object(
+        stages, limits, solver, state, p, consgraph, overrides
+    )
+    state, solver = update_graph.modify(stages, limits, solver, p)
+    state, solver = update_graph.update(stages, limits, solver, p)
 
-    populate_placeholder.populate_intermediate_pholders(p,solver)
+    state, solver = solve_objects.solve_large_and_medium_object(
+        stages, limits, solver, state, p, consgraph, overrides
+    )
+
+    populate_placeholder.populate_intermediate_pholders(p, solver)
 
     record.export_supporter(state)
 
-    state,solver = update_graph.add_acdc(solver,p)
-    state,solver = solve_objects.solve_small_object(stages,limits,solver,state,p,consgraph,overrides)
-    populate_placeholder.populate_intermediate_pholders(p,state)
+    state, solver = update_graph.add_acdc(solver, p)
+    state, solver = solve_objects.solve_small_object(
+        stages, limits, solver, state, p, consgraph, overrides
+    )
+    populate_placeholder.populate_intermediate_pholders(p, state)
 
-    height = complete_structure.finalize_scene(overrides,stages,state,solver,output_folder,p,terrain,solved_rooms,house_bbox,camera_rigs)
+    height = complete_structure.finalize_scene(
+        overrides,
+        stages,
+        state,
+        solver,
+        output_folder,
+        p,
+        terrain,
+        solved_rooms,
+        house_bbox,
+        camera_rigs,
+    )
 
     return {
         "height_offset": height,

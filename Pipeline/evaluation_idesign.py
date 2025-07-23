@@ -4,7 +4,6 @@ import re
 import time
 
 import numpy as np
-import requests
 from app.utils import dict2str
 from gpt import GPT4
 

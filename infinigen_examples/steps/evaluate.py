@@ -1,14 +1,12 @@
+import base64
+import copy
 import json
 import os
-import argparse
-import base64
-import json
 import re
 
+import bpy
 import numpy as np
 import requests
-import copy
-import bpy
 import trimesh
 from shapely.geometry import Polygon
 
@@ -32,7 +30,6 @@ def eval_metric(state, iter, remove_bad=False, save=True):
 
 
 import bmesh
-import bpy
 
 
 def calc_intersection_volume(obj_a, obj_b):
@@ -251,8 +248,6 @@ def eval_general_score(image_path_1, layout, image_path_2=None):
 
     # return real, func, complet
 
-    
-
     # TODO : OpenAI API Key
     api_key = "YOUR_API_KEY"
 
@@ -438,7 +433,6 @@ def get_relation_mapping(state):
 #     return stop
 
 
-
 def del_top_collide_obj(state, iter):
     # got children-parent pair
     map_cp = get_relation_mapping(state)
@@ -463,10 +457,9 @@ def del_top_collide_obj(state, iter):
                 record[objname] = 0
             record[objname] += v
 
-
     groups = find_connected_components(collide_pairs)
     for group in groups:
-        print("##### grouped collision objects:",group)
+        print("##### grouped collision objects:", group)
         record_group = {key: record[key] for key in group if key in record}
         # max_key = max(record, key=record.get)
         max_value = max(record_group.values())
@@ -488,12 +481,10 @@ def del_top_collide_obj(state, iter):
             state.trimesh_scene, objname, delete_blender=True, delete_asset=True
         )
         state.objs.pop(max_key)
-        
 
-
-   
     stop = False
     return stop
+
 
 def find_connected_components(edges):
     # 收集所有唯一节点
@@ -502,16 +493,16 @@ def find_connected_components(edges):
         nodes.add(u)
         nodes.add(v)
     nodes = list(nodes)
-    
+
     # 构建邻接表
     adj = {node: [] for node in nodes}
     for u, v in edges:
         adj[u].append(v)
         adj[v].append(u)
-    
+
     visited = set()
     components = []
-    
+
     for node in nodes:
         if node not in visited:
             # DFS遍历
@@ -527,5 +518,5 @@ def find_connected_components(edges):
                         stack.append(neighbor)
             # 按字母顺序排序节点（确保输出一致性）
             components.append(sorted(component))
-    
+
     return components

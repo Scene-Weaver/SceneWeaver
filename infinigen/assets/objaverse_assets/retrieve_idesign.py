@@ -31,7 +31,7 @@ meta = json.load(
             "objaverse_meta.json",
             token=True,
             repo_type="dataset",
-            local_dir="/home/yandan/workspace/IDesign/OpenShape-Embeddings",
+            local_dir="~/workspace/IDesign/OpenShape-Embeddings",
         )
     )
 )
@@ -43,7 +43,7 @@ deser = torch.load(
         "objaverse.pt",
         token=True,
         repo_type="dataset",
-        local_dir="/home/yandan/workspace/IDesign/OpenShape-Embeddings",
+        local_dir="~/workspace/IDesign/OpenShape-Embeddings",
     ),
     map_location="cpu",
 )
@@ -122,7 +122,7 @@ def preprocess(input_string):
 
 
 if __name__ == "__main__":
-    # with open("/home/yandan/workspace/infinigen/roominfo.json","r") as f:
+    # with open("../roominfo.json","r") as f:
     #     j = json.load(f)
     #     roomtype = j["roomtype"]
     save_dir = sys.argv[1]
@@ -139,14 +139,7 @@ if __name__ == "__main__":
 
         LoadObjavFiles = dict()
         for category, cnt in LoadObjavCnts.items():
-            # if category.lower() == "meeting_table":
-            #     a = 1
-            # if category.lower() == "car":
-            #     LoadObjavFiles["car"] = [
-            #         "/home/yandan/.objaverse/hf-objaverse-v1/glbs/000-068/45840e2136c44080b4c1e7521cce8db3.glb"
-            #     ]
-            #     continue
-            # text = preprocess(f"A high-poly {roomtype} {category} in high quality")
+           
             text = preprocess(f"A high-poly realistic {category} in high quality")
             device = clip_model.device
             tn = clip_prep(
@@ -192,19 +185,21 @@ if __name__ == "__main__":
                     break
 
                 # render
+                import os
+                current_file_path = os.path.abspath(__file__)
                 cmd = f"""
-                source ~/anaconda3/etc/profile.d/conda.sh
+                source /home/yandan/anaconda3/etc/profile.d/conda.sh
                 conda activate infinigen_python
-                python /home/yandan/workspace/infinigen/infinigen/assets/objaverse_assets/blender_render.py {file_path} > run1.log 2>&1
+                python {current_file_path}/blender_render.py {file_path} > run1.log 2>&1
                 """
                 subprocess.run(["bash", "-c", cmd])
 
                 # front view
 
                 cmd = f"""
-                source ~/anaconda3/etc/profile.d/conda.sh
+                source /home/yandan/anaconda3/etc/profile.d/conda.sh
                 conda activate layoutgpt
-                python /home/yandan/workspace/infinigen/Pipeline/app/tool/objaverse_frontview.py {render_folder} {category} > run2.log 2>&1
+                python {current_file_path}/../../../Pipeline/app/tool/objaverse_frontview.py {render_folder} {category} > run2.log 2>&1
                 """
                 subprocess.run(["bash", "-c", cmd])
                 if os.path.exists(f"{render_folder}/metadata.json"):

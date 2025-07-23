@@ -1,19 +1,14 @@
-import sys
-from typing import Dict
-
-from app.tool.base import BaseTool
 import json
 import os
-import random
-import numpy as np
-from gpt import GPT4 
-from app.utils import extract_json, dict2str, lst2str
-import json
 
+from gpt import GPT4
+
+from app.prompt.gpt.update_gpt import system_prompt, user_prompt
+from app.tool.base import BaseTool
 from app.tool.update_infinigen import update_infinigen
-from app.prompt.gpt.update_gpt import system_prompt,user_prompt
+from app.utils import dict2str, extract_json, lst2str
 
-DESCRIPTION="""
+DESCRIPTION = """
 Modify layout with GPT. Works with all room types. 
 This method is not recommended for slight layout adjustments; it is better suited for major changes when necessary.
 
@@ -27,7 +22,6 @@ Can not obey the current relation, such as move object away from the wall when t
 
 
 class UpdateLayoutExecute(BaseTool):
-    
     name: str = "update_layout"
     description: str = DESCRIPTION
     parameters: dict = {
@@ -47,21 +41,19 @@ class UpdateLayoutExecute(BaseTool):
         roomtype = os.getenv("roomtype")
         action = self.name
         try:
-            #find scene
+            # find scene
             json_name = self.update_scene_gpt(user_demand, ideas, iter, roomtype)
             # json_name = update_ds(user_demand,ideas,iter,roomtype)
-            success = update_infinigen("update", iter, json_name,ideas=ideas)
+            success = update_infinigen("update", iter, json_name, ideas=ideas)
             assert success
-            return f"Successfully Modify layout with GPT."
-        except Exception as e:
-            return f"Error Modify layout with GPT"
+            return "Successfully Modify layout with GPT."
+        except Exception:
+            return "Error Modify layout with GPT"
 
     def update_scene_gpt(self, user_demand, ideas, iter, roomtype):
         save_dir = os.getenv("save_dir")
         render_path = f"{save_dir}/record_scene/render_{iter-1}.jpg"
-        with open(
-            f"{save_dir}/record_scene/layout_{iter-1}.json", "r"
-        ) as f:
+        with open(f"{save_dir}/record_scene/layout_{iter-1}.json", "r") as f:
             layout = json.load(f)
 
         roomsize = layout["roomsize"]
@@ -88,9 +80,9 @@ class UpdateLayoutExecute(BaseTool):
         gpt_text_response = gpt(payload=prompt_payload, verbose=True)
         print(gpt_text_response)
 
-        json_name = f"{save_dir}/pipeline/update_gpt_results_{iter}_response.json"
-        with open(json_name, "w") as f:
-            json.dump(gpt_text_response, f, indent=4)
+        # json_name = f"{save_dir}/pipeline/update_gpt_results_{iter}_response.json"
+        # with open(json_name, "w") as f:
+        #     json.dump(gpt_text_response, f, indent=4)
 
         new_layout = extract_json(gpt_text_response)
 

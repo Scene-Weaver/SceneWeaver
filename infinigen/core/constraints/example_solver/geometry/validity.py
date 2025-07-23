@@ -5,7 +5,6 @@
 
 import logging
 
-import bpy
 import gin
 from shapely.geometry import MultiPolygon, Point, Polygon
 
@@ -24,7 +23,6 @@ from infinigen.core.constraints.evaluator.node_impl.trimesh_geometry import (
 from infinigen.core.constraints.example_solver.geometry.stability import stable_against
 from infinigen.core.constraints.example_solver.state_def import State
 from infinigen.core.util import blender as butil
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 logger = logging.getLogger(__name__)
 

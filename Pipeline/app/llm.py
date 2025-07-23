@@ -4,14 +4,11 @@ from typing import Dict, List, Optional, Union
 import tiktoken
 from openai import (
     APIError,
-    AzureOpenAI,
-    AsyncAzureOpenAI,
-    AsyncOpenAI,
     AuthenticationError,
+    AzureOpenAI,
     OpenAIError,
     RateLimitError,
 )
-from openai.types.chat.chat_completion_message import ChatCompletionMessage
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -30,7 +27,7 @@ from app.schema import (
     ToolChoice,
 )
 
-REASONING_MODELS = ["o1", "o3-mini","o4-mini-2025-04-16"]
+REASONING_MODELS = ["o1", "o3-mini", "o4-mini-2025-04-16"]
 MULTIMODAL_MODELS = [
     "gpt-4-vision-preview",
     "gpt-4o",
@@ -220,13 +217,11 @@ class LLM:
                 # If the model is not in tiktoken's presets, use cl100k_base as default
                 self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
-            
-               
             REGION = "eastus2"
             API_BASE = "https://api.tonggpt.mybigai.ac.cn/proxy"
             self.ENDPOINT = f"{API_BASE}/{REGION}"
-            self.MODEL = self.model #"gpt-4o-2024-08-06"
-            # with open("/home/yandan/workspace/key.txt","r") as f:
+            self.MODEL = self.model  # "gpt-4o-2024-08-06"
+            # with open("key.txt","r") as f:
             #     lines = f.readlines()
             # self.API_KEY = lines[0].strip()
             self.client = AzureOpenAI(
@@ -234,7 +229,6 @@ class LLM:
                 api_version=self.api_version,
                 azure_endpoint=self.ENDPOINT,
             )
-            
 
             self.token_counter = TokenCounter(self.tokenizer)
 
@@ -430,9 +424,7 @@ class LLM:
 
             if not stream:
                 # Non-streaming request
-                response = self.client.chat.completions.create(
-                    **params, stream=False
-                )
+                response = self.client.chat.completions.create(**params, stream=False)
 
                 if not response.choices or not response.choices[0].message.content:
                     raise ValueError("Empty or invalid response from LLM")
@@ -475,10 +467,10 @@ class LLM:
             # Re-raise token limit errors without logging
             raise
         except ValueError:
-            logger.exception(f"Validation error")
+            logger.exception("Validation error")
             raise
         except OpenAIError as oe:
-            logger.exception(f"OpenAI API error")
+            logger.exception("OpenAI API error")
             if isinstance(oe, AuthenticationError):
                 logger.error("Authentication failed. Check API key.")
             elif isinstance(oe, RateLimitError):
@@ -487,7 +479,7 @@ class LLM:
                 logger.error(f"API error: {oe}")
             raise
         except Exception:
-            logger.exception(f"Unexpected error in ask")
+            logger.exception("Unexpected error in ask")
             raise
 
     @retry(
@@ -743,9 +735,7 @@ class LLM:
             # response: ChatCompletion = self.client.chat.completions.create(
             #     **params, stream=False
             # )
-            response = self.client.chat.completions.create(
-                **params, stream=False
-            )
+            response = self.client.chat.completions.create(**params, stream=False)
 
             # Check if response is valid
             if not response.choices or not response.choices[0].message:

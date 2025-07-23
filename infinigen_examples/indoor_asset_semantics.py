@@ -2,10 +2,10 @@
 # This source code is licensed under the BSD 3-Clause license found in the LICENSE file in the root directory of this source tree.
 
 # Authors: Alexander Raistrick
-import infinigen.assets.objaverse_assets as objaverse_assets
 import infinigen.assets.metascene_assets as metascene_assets
-import infinigen.assets.threedfront_assets as threedfront_assets
+import infinigen.assets.objaverse_assets as objaverse_assets
 import infinigen.assets.static_assets as static_assets
+import infinigen.assets.threedfront_assets as threedfront_assets
 from infinigen.assets.objects import (
     appliances,
     bathroom,
@@ -197,7 +197,7 @@ def home_asset_usage():
             static_assets.StaticSofaFactory,
             objaverse_assets.GeneralObjavFactory,
             metascene_assets.GeneralMetaFactory,
-            threedfront_assets.GeneralThreedFrontFactory
+            threedfront_assets.GeneralThreedFrontFactory,
         },
     )
 
@@ -251,7 +251,7 @@ def home_asset_usage():
             elements.RackFactory,
             objaverse_assets.GeneralObjavFactory,
             metascene_assets.GeneralMetaFactory,
-            threedfront_assets.GeneralThreedFrontFactory
+            threedfront_assets.GeneralThreedFrontFactory,
         },
     )
 

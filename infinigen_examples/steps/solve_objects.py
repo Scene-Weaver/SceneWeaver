@@ -1,14 +1,11 @@
 from infinigen.core.constraints.example_solver import (
-    Solver,
     greedy,
-    populate,
-    state_def,
 )
+
 from .basic_scene import all_vars
 
 
-def solve_large_object(stages,limits,solver,state,p,consgraph,overrides):
-
+def solve_large_object(stages, limits, solver, state, p, consgraph, overrides):
     # region solve large
     def solve_large():
         assignments = greedy.iterate_assignments(
@@ -31,12 +28,10 @@ def solve_large_object(stages,limits,solver,state,p,consgraph,overrides):
     state = p.run_stage("solve_large", solve_large, use_chance=False, default=state)
     # endregion
 
-    return state,solver
+    return state, solver
 
 
-
-def solve_medium_object(stages,limits,solver,state,p,consgraph,overrides):
-
+def solve_medium_object(stages, limits, solver, state, p, consgraph, overrides):
     # region solve medium
     def solve_medium():
         n_steps = overrides["solve_steps_medium"]
@@ -66,13 +61,15 @@ def solve_medium_object(stages,limits,solver,state,p,consgraph,overrides):
             )
 
         return solver.state
+
     state = p.run_stage("solve_medium", solve_medium, use_chance=False, default=state)
     # endregion
-    return state,solver
+    return state, solver
 
 
-def solve_large_and_medium_object(stages,limits,solver,state,p,consgraph,overrides):
-
+def solve_large_and_medium_object(
+    stages, limits, solver, state, p, consgraph, overrides
+):
     # region solve_large_and_medium
     def solve_large_and_medium():
         for i in range(3):
@@ -80,7 +77,6 @@ def solve_large_and_medium_object(stages,limits,solver,state,p,consgraph,overrid
                 stages["on_floor"], state, all_vars, limits, nonempty=True
             )
             for j, vars in enumerate(assignments):
-                
                 solver.solve_objects(
                     consgraph,
                     stages["on_floor"],
@@ -117,10 +113,10 @@ def solve_large_and_medium_object(stages,limits,solver,state,p,consgraph,overrid
         default=state,
     )
 
-    return state,solver
+    return state, solver
 
-def solve_small_object(stages,limits,solver,state,p,consgraph,overrides):
 
+def solve_small_object(stages, limits, solver, state, p, consgraph, overrides):
     def solve_small():
         n_steps = overrides["solve_steps_small"]
 
@@ -148,9 +144,9 @@ def solve_small_object(stages,limits,solver,state,p,consgraph,overrides):
                 expand_collision=True,
                 desc=f"obj_on_support_{i}",
             )
-        
+
         return solver.state
 
     state = p.run_stage("solve_small", solve_small, use_chance=False, default=state)
-    
-    return state,solver
+
+    return state, solver

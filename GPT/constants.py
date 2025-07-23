@@ -1,7 +1,6 @@
 import os
-from pathlib import Path
 
-ABS_PATH_OF_HOLODECK = "/home/yandan/workspace/Holodeck/"
+ABS_PATH_OF_HOLODECK = "~/workspace/Holodeck/"
 
 ASSETS_VERSION = os.environ.get("ASSETS_VERSION", "2023_09_23")
 HD_BASE_VERSION = os.environ.get("HD_BASE_VERSION", "2023_09_23")

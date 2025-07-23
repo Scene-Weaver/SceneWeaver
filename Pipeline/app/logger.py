@@ -5,7 +5,6 @@ from loguru import logger as _logger
 
 from app.config import PROJECT_ROOT
 
-
 _print_level = "INFO"
 
 

@@ -1,10 +1,10 @@
 import json
-import os
+
 import matplotlib.pyplot as plt
 
 # Collect metrics from all 8 files
 metrics = []
-filecnt=5
+filecnt = 5
 for i in range(filecnt):
     with open(f"metric_{i}.json") as f:
         data = json.load(f)
@@ -24,7 +24,7 @@ for m in metrics:
 # Plotting
 plt.figure(figsize=(10, 6))
 for cat in categories:
-    plt.plot(range(filecnt), scores[cat], label=cat, marker='o')
+    plt.plot(range(filecnt), scores[cat], label=cat, marker="o")
 
 plt.title("GPT Scores Across Metric Files")
 plt.xlabel("Metric File Index")

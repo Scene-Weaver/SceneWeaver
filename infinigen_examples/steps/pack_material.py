@@ -1,5 +1,7 @@
 import os
+
 import bpy
+
 
 def pack_material(blend_path):
     bpy.context.preferences.filepaths.save_version = 0
@@ -10,6 +12,7 @@ def pack_material(blend_path):
     bpy.ops.wm.save_as_mainfile(filepath=blend_path, check_existing=False)
     return
 
+
 if __name__ == "__main__":
     method = "atiss"
     basedir = f"/mnt/fillipo/yandan/scenesage/record_scene/{method}"
@@ -18,6 +21,3 @@ if __name__ == "__main__":
         pack_material(blend_path)
 
         a = 1
-
-
-

@@ -8,16 +8,11 @@
 import math
 
 import bpy
-import mathutils
-import numpy as np
 from mathutils import Vector
 
 from infinigen.assets.utils.object import new_bbox
-from infinigen.core import tagging
-from infinigen.core import tags as t
 from infinigen.core.tagging import tag_support_surfaces
 from infinigen.core.util import blender as butil
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 from .base import MetaSceneFactory
 
@@ -59,7 +54,7 @@ class MetaCategoryFactory(MetaSceneFactory):
         print(self.asset_file)
         bpy.ops.import_scene.gltf(filepath=self.asset_file)
         imported_obj = bpy.context.selected_objects[0]
-        
+
         # scale
         self.scale = list(imported_obj.scale)
         bpy.context.view_layer.objects.active = imported_obj  # Set as active object

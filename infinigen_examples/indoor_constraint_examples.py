@@ -8,23 +8,15 @@ from collections import OrderedDict
 
 from numpy.random import uniform
 
-from infinigen.assets import  objaverse_assets, static_assets
 from infinigen.assets.objects import (
-    appliances,
-    bathroom,
-    decor,
-    elements,
     lamp,
     seating,
     shelves,
-    table_decorations,
-    tables,
     tableware,
-    wall_decorations,
 )
 from infinigen.core.constraints import constraint_language as cl
 from infinigen.core.constraints import usage_lookup
-from infinigen.core.tags import Semantics, Subpart
+from infinigen.core.tags import Semantics
 
 from .indoor_asset_semantics import home_asset_usage
 from .util import constraint_util as cu
@@ -309,7 +301,7 @@ def home_constraints():
     plant_obj = obj[tableware.LargePlantContainerFactory].related_to(rooms, cu.on_floor)
     plant1_obj = obj[tableware.PlantContainerFactory]
     # FloorLamp_obj = furn   iture[lamp.FloorLampFactory].related_to(ArmChair_obj,cu.side_by_side)
-    
+
     constraints["living_room"] = newroom.all(
         lambda r: (
             (desk_obj.related_to(r).count() >= 1)
@@ -334,9 +326,7 @@ def home_constraints():
                 )
             )
             * bookcase_obj.related_to(r).all(
-                lambda s: (
-                    plant1_obj.related_to(s, cu.on).count().in_range(1, 1)
-                )
+                lambda s: (plant1_obj.related_to(s, cu.on).count().in_range(1, 1))
             )
             # * SideTable_obj.related_to(r).count().in_range(2, 2)
             # * SideTable_obj.related_to(Sofa_obj.related_to(r), cu.side_by_side).count().in_range(2, 2)

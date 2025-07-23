@@ -11,7 +11,6 @@ import bpy
 
 from infinigen.assets.utils.object import new_bbox
 from infinigen.core.tagging import tag_support_surfaces
-from infinigen_examples.util.visible import invisible_others, visible_others
 
 from .base import ThreedFrontFactory
 
@@ -34,12 +33,6 @@ class ThreedFrontCategoryFactory(ThreedFrontFactory):
         self.location_orig = self._position
 
     def create_asset(self, **params) -> bpy.types.Object:
-        print(self.asset_file)
-        if (
-            self.asset_file
-            == "/home/yandan/dataset/3D-scene/3D-FUTURE-model/a3d017a0-f180-45c9-b402-4abf214e0b4f/raw_model.obj"
-        ):
-            a = 1
         # Step 1: Keep track of existing objects
         before = set(bpy.context.scene.objects)
 

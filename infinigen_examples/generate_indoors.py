@@ -15,8 +15,7 @@ logging.basicConfig(
 )
 import os
 import sys
-import pdb
-pdb.set_trace()
+
 import bpy
 import gin
 

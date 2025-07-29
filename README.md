@@ -56,6 +56,25 @@ conda env create --prefix /home/yandan/anaconda3/envs/sceneweaver -f environment
 ```
 conda create --name infinigen python=3.10.14
 conda activate infinigen 
+pip install bpy==3.6.0
+pip install gin-config
+pip install frozendict
+pip install shapely
+pip install trimesh
+pip install tqdm
+pip install opencv-python
+pip install matplotlib
+pip install imageio
+pip install scipy
+pip install scikit-learn
+pip install psutil
+pip install scikit-image
+pip install submitit
+pip install python-fcl
+pip install pandas
+pip install geomdl
+pip install Rtree
+
 ```
 
 Then, install using one of the options below:
@@ -130,7 +149,7 @@ We provide two resource & retrieve pipeline for Objaverse (OpenShape & Holodeck)
 ```
 cd Pipeline
 conda activate sceneweaver
-python main.py --prompt Design me a bedroom. --cnt 1 --basedir PATH/TO/SAVE
+python main.py --prompt "Design me a bedroom." --cnt 1 --basedir PATH/TO/SAVE
 ```
 Then you can check the scene in `PATH/TO/SAVE`. The intermediate scene in each step is saved in `record_files`. You can open relative `.blend` file in blender to check the result of each step.
 

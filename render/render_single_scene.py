@@ -290,7 +290,7 @@ def setup_rotation_anchor():
         bpy.context.collection.objects.link(anchor)
 
     for obj in bpy.data.objects:
-        if obj.type == "MESH":
+        if obj.type == "MESH" and not obj.name.startswith("WindowFactory"):
             obj.parent = anchor
 
     return anchor

@@ -29,7 +29,7 @@
 <!-- This is the official repository of [**PhyScene: Physically Interactable 3D Scene Synthesis for Embodied AI**](https://arxiv.org/abs/2211.05272). -->
 
 
-For more information, please visit our [**project page**](https://sceneweaver.github.io).
+For more information, please visit our [**project page**](https://scene-weaver.github.io).
 
 ## Requirements
 - Linux machine

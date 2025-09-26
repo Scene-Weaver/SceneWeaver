@@ -15,7 +15,7 @@
 <br>
 <div align="center">
     <!-- <a href="https://cvpr.thecvf.com/virtual/2023/poster/22552" target="_blank"> -->
-    <a href="https://arxiv.org/abs/2404.09465" target="_blank"> 
+    <a href="https://arxiv.org/abs/2509.20414" target="_blank"> 
       <img src="https://img.shields.io/badge/Paper-arXiv-green" alt="Paper arXiv"></a>
     <a href="https://scene-weaver.github.io" target="_blank">
       <img src="https://img.shields.io/badge/Page-SceneWeaver-blue" alt="Project Page"/></a>
